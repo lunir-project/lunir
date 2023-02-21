@@ -69,7 +69,6 @@ impl IdentifierString for String {
     }
 
     fn sanitize_special(&self) -> String {
-        // bro why don't I just make an array of them then replace them all it'd be way easier
         let special_chars = {
             let mut tmp = std::collections::HashMap::new();
 
@@ -110,8 +109,6 @@ pub struct Boolean(bool);
 #[derive(Debug, Clone)]
 pub struct Str(String);
 
-// Cannot use the IL BinaryOpKind because the AST supports compound operators
-// fair
 #[derive(Debug, Clone)]
 pub enum BinaryExpressionKind {
     Add,

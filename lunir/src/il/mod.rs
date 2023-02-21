@@ -23,13 +23,13 @@
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
-enum Table {
+pub enum Table {
     Map(HashMap<Value, Value>),
     Array(Vec<Value>),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-enum Value {
+pub enum Value {
     Nil,
     Boolean(bool),
     ConstantIndex(usize),
@@ -38,7 +38,7 @@ enum Value {
 }
 
 #[derive(Debug, Clone)]
-enum Constant {
+pub enum Constant {
     Nil,
     Boolean(bool),
     Function(Function),
@@ -48,19 +48,19 @@ enum Constant {
 }
 
 #[derive(Debug, Clone)]
-struct Load {
+pub struct Load {
     dest: usize,
     src: Value,
 }
 
 #[derive(Debug, Clone)]
-struct GetGlobal {
+pub struct GetGlobal {
     dest: usize,
     constant: usize,
 }
 
 #[derive(Debug, Clone)]
-struct GetTable {
+pub struct GetTable {
     dest: usize,
     source: usize,
     index: Value,
@@ -78,7 +78,7 @@ pub enum BinaryOpKind {
 }
 
 #[derive(Debug, Clone)]
-struct BinaryOp {
+pub struct BinaryOp {
     kind: BinaryOpKind,
     dest: usize,
 
@@ -94,7 +94,7 @@ pub enum UnaryOpKind {
 }
 
 #[derive(Debug, Clone)]
-struct UnaryOp {
+pub struct UnaryOp {
     kind: UnaryOpKind,
     dest: usize,
 
@@ -102,7 +102,7 @@ struct UnaryOp {
 }
 
 #[derive(Debug, Clone)]
-enum ConditionalKind {
+pub enum ConditionalKind {
     Eq,
     Ge,
     Gt,
@@ -114,7 +114,6 @@ enum ConditionalKind {
     Or,
 }
 
-// Not gonna be an instruction, its own thing
 #[derive(Debug, Clone)]
 struct Conditional {
     kind: ConditionalKind,
@@ -133,18 +132,18 @@ struct JumpBranch {
 
 // Unconditional jump
 #[derive(Debug, Clone)]
-struct Jump {
+pub struct Jump {
     branch: JumpBranch,
 }
 
 #[derive(Debug, Clone)]
-struct ConditionalJump {
+pub struct ConditionalJump {
     branch: JumpBranch,
     condition: Conditional,
 }
 
 #[derive(Debug, Clone)]
-struct NewTable {
+pub struct NewTable {
     dest: usize,
 
     table_size: usize,
@@ -152,30 +151,35 @@ struct NewTable {
 }
 
 #[derive(Debug, Clone)]
-struct Call {
-    callee: usize,
-
-    // 0 means variable
-    num_args: usize,
-    num_returns: usize,
+enum OptVariable {
+    Variable,
+    Number(usize),
 }
 
 #[derive(Debug, Clone)]
-struct Return {
+pub struct Call {
+    callee: usize,
+
+    num_args: OptVariable,
+    num_returns: OptVariable,
+}
+
+#[derive(Debug, Clone)]
+pub struct Return {
     from: usize,
     count: usize,
 }
 
 #[repr(u8)]
 #[derive(Debug, Clone)]
-enum VarargTag {
+pub enum VarargTag {
     HasArg = 1,
     IsVararg = 2,
     NeedsArg = 4,
 }
 
 #[derive(Debug, Clone)]
-struct Function {
+pub struct Function {
     constants: Vec<Constant>,
     code: Vec<u8>,
     is_variadic: VarargTag,
@@ -187,7 +191,7 @@ struct Function {
 }
 
 #[derive(Debug, Clone)]
-enum Instruction {
+pub enum Instruction {
     Load(Box<Load>),
 
     GetGlobal(Box<GetGlobal>),
