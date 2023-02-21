@@ -61,7 +61,7 @@ impl IdentifierString for String {
 
         for i in 1..result.len() {
             if result.chars().nth(i).unwrap() == '_' && result.chars().nth(i - 1).unwrap() == '_' {
-                result.replace_range(i..i + 1, "");
+                result.remove(i);
             }
         }
 
@@ -203,24 +203,24 @@ impl std::fmt::Display for UnaryOpKind {
 
 #[derive(Debug, Clone)]
 pub struct IndexOp {
-    table: Expression,
     key: Expression,
+    table: Expression,
 }
 
 #[derive(Debug, Clone)]
 pub struct CallExpression {
-    function: Expression,
     arguments: Vec<Expression>,
+    function: Expression,
 
     is_self: bool,
 }
 
 #[derive(Debug, Clone)]
 pub struct Function {
-    parameters: Vec<Expression>,
     body: Box<StatBlock>,
-
     has_vararg: bool,
+
+    parameters: Vec<Expression>,
     self_arg: Option<Expression>,
 }
 
