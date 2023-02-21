@@ -1,3 +1,5 @@
+// MIT License
+
 // Copyright (c) 2023 lunir-project
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -19,8 +21,15 @@
 // SOFTWARE.
 
 use serde::*;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+enum Table {
+    Map(HashMap<Value, Value>),
+    Array(Vec<Value>),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 enum Value {
     Nil,
     Boolean(bool),
@@ -36,6 +45,7 @@ enum Constant {
     Function(Function),
     Number(f64),
     String(String),
+    Table(Table),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -143,6 +153,15 @@ struct NewTable {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+struct Call {
+    callee: usize,
+
+    // 0 means variable
+    num_args: usize,
+    num_returns: usize,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 struct Return {
     from: usize,
     count: usize,
@@ -183,4 +202,6 @@ enum Instruction {
 
     NewTable(Box<NewTable>),
     Return(Box<Return>),
+
+    Call(Box<Call>),
 }
