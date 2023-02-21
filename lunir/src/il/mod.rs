@@ -11,9 +11,9 @@ enum Value {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 enum Instruction {
-    // Numbers like 0 and 1 refer to the positional parameters in the enum.
+    // P(n) refers to the positional parameters in the enum.
 
-    // Stack[0] = Value
+    // Stack[P(0)] = P(1)
     Load(usize, Value),
-    
+
 }
