@@ -23,3 +23,28 @@
 pub mod expression;
 pub mod statement;
 pub mod tree;
+
+#[cfg(test)]
+mod tests {
+    use super::expression::{BinaryExpressionKind, IdentifierString};
+
+    #[test]
+    fn test_sanitization() {
+        assert_eq!(
+            String::from("test\n\n\n\x12").sanitize_special(),
+            "test\\n\\n\\n\\18"
+        );
+        assert_eq!(
+            String::from("hello-world I'm 0x90!").sanitize_identifier(),
+            "hello_world_Im_0x90"
+        );
+    }
+
+    #[test]
+    fn test_compound_conversion() {
+        assert_eq!(
+            BinaryExpressionKind::Add.to_compound(),
+            BinaryExpressionKind::AddAssign
+        );
+    }
+}
