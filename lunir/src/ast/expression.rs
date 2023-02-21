@@ -109,7 +109,7 @@ pub struct Boolean(bool);
 #[derive(Debug, Clone)]
 pub struct Str(String);
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum BinaryExpressionKind {
     Add,
     Sub,
@@ -226,7 +226,7 @@ pub enum Expression {
     Boolean(Rc<Boolean>),
     BinaryOp(Rc<BinaryExpression>),
     UnaryOp(Rc<UnaryExpression>),
-    String(Str),
+    String(Rc<Str>),
     Number(Rc<Number>),
     Nil(Rc<Nil>),
     IndexOp(Rc<IndexOp>),
