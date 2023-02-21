@@ -20,16 +20,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use serde::*;
 use std::collections::HashMap;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 enum Table {
     Map(HashMap<Value, Value>),
     Array(Vec<Value>),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 enum Value {
     Nil,
     Boolean(bool),
@@ -38,7 +37,7 @@ enum Value {
     StackIndex(usize),
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 enum Constant {
     Nil,
     Boolean(bool),
@@ -48,27 +47,27 @@ enum Constant {
     Table(Table),
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 struct Load {
     dest: usize,
     src: Value,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 struct GetGlobal {
     dest: usize,
     constant: usize,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 struct GetTable {
     dest: usize,
     source: usize,
     index: Value,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-enum BinaryOpKind {
+#[derive(Debug, Clone)]
+pub enum BinaryOpKind {
     Add,
     Concat,
     Div,
@@ -78,7 +77,7 @@ enum BinaryOpKind {
     Sub,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 struct BinaryOp {
     kind: BinaryOpKind,
     dest: usize,
@@ -87,14 +86,14 @@ struct BinaryOp {
     right: Value,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-enum UnaryOpKind {
+#[derive(Debug, Clone)]
+pub enum UnaryOpKind {
     Len,
     Not,
     Neg,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 struct UnaryOp {
     kind: UnaryOpKind,
     dest: usize,
@@ -102,7 +101,7 @@ struct UnaryOp {
     value: Value,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 enum ConditionalKind {
     Eq,
     Ge,
@@ -116,7 +115,7 @@ enum ConditionalKind {
 }
 
 // Not gonna be an instruction, its own thing
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 struct Conditional {
     kind: ConditionalKind,
     dest: usize,
@@ -125,7 +124,7 @@ struct Conditional {
     right: Value,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 struct JumpBranch {
     start: usize,
     end: usize,
@@ -133,18 +132,18 @@ struct JumpBranch {
 }
 
 // Unconditional jump
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 struct Jump {
     branch: JumpBranch,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 struct ConditionalJump {
     branch: JumpBranch,
     condition: Conditional,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 struct NewTable {
     dest: usize,
 
@@ -152,7 +151,7 @@ struct NewTable {
     array_size: usize,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 struct Call {
     callee: usize,
 
@@ -161,21 +160,21 @@ struct Call {
     num_returns: usize,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 struct Return {
     from: usize,
     count: usize,
 }
 
 #[repr(u8)]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 enum VarargTag {
     HasArg = 1,
     IsVararg = 2,
     NeedsArg = 4,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 struct Function {
     constants: Vec<Constant>,
     code: Vec<u8>,
@@ -187,7 +186,7 @@ struct Function {
     max_stack_size: u8,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 enum Instruction {
     Load(Box<Load>),
 

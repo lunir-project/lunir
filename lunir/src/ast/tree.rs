@@ -20,6 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-pub mod expression;
-pub mod statement;
-pub mod tree;
+// ok we need to write some expressions and statements
+// ok
+
+pub enum NodeKind {
+    
+}
+
+pub struct Node {
+    kind: Box<NodeKind>,
+    children: Vec<Node>,
+}

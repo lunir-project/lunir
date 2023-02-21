@@ -19,3 +19,220 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
+use crate::ast::statement::*;
+use crate::il::UnaryOpKind;
+
+use std::rc::Rc;
+
+pub trait IdentifierString {
+    fn can_identify(&self) -> bool;
+    fn sanitize_identifier(&self) -> String;
+    fn sanitize_special(&self) -> String;
+}
+
+impl IdentifierString for String {
+    fn can_identify(&self) -> bool {
+        if self.is_empty() || self.chars().nth(0).unwrap().is_digit(10) {
+            return false;
+        }
+
+        if self.chars().any(|c| !c.is_alphanumeric() && c != '_') {
+            return false;
+        }
+
+        true
+    }
+
+    fn sanitize_identifier(&self) -> String {
+        let mut result = self
+            .chars()
+            .filter_map(|c| match c {
+                '-' | ' ' | '\t' | '\n' => Some('_'),
+                _ if c.is_alphanumeric() || c == '_' => Some(c),
+                _ => None,
+            })
+            .collect::<String>();
+
+        result = (!result.is_empty())
+            .then_some(&result)
+            .unwrap_or(&format!("_{result}"))
+            .to_string();
+
+        for i in 1..result.len() {
+            if result.chars().nth(i).unwrap() == '_' && result.chars().nth(i - 1).unwrap() == '_' {
+                result.replace_range(i..i + 1, "");
+            }
+        }
+
+        result
+    }
+
+    fn sanitize_special(&self) -> String {
+        // bro why don't I just make an array of them then replace them all it'd be way easier
+        let special_chars = {
+            let mut tmp = std::collections::HashMap::new();
+
+            tmp.insert('\n', "\\n");
+            tmp.insert('\r', "\\r");
+            tmp.insert('\t', "\\t");
+            tmp.insert('\"', "\\\"");
+            tmp.insert('\\', "\\\\");
+
+            tmp
+        };
+
+        let mut result = String::with_capacity(self.len());
+
+        for c in self.chars() {
+            if special_chars.contains_key(&c) {
+                result.push_str(special_chars.get(&c).unwrap());
+            } else if c >= ' ' && c <= '~' {
+                result.push(c);
+            } else {
+                result.push_str(format!("\\{}", c as u32).as_str());
+            }
+        }
+
+        result
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Nil;
+
+#[derive(Debug, Clone)]
+pub struct Number(f64);
+
+#[derive(Debug, Clone)]
+pub struct Boolean(bool);
+
+#[derive(Debug, Clone)]
+pub struct Str(String);
+
+// Cannot use the IL BinaryOpKind because the AST supports compound operators
+// fair
+#[derive(Debug, Clone)]
+pub enum BinaryExpressionKind {
+    Add,
+    Sub,
+    Mul,
+    Div,
+    Mod,
+    Pow,
+    Concat,
+
+    AddAssign,
+    SubAssign,
+    MulAssign,
+    DivAssign,
+    ModAssign,
+    PowAssign,
+    ConcatAssign,
+}
+
+#[derive(Debug, Clone)]
+pub struct BinaryExpression {
+    kind: BinaryExpressionKind,
+    left: Expression,
+    right: Expression,
+}
+
+impl BinaryExpressionKind {
+    pub fn to_compound(&self) -> Self {
+        match self {
+            Self::Add => Self::AddAssign,
+            Self::Sub => Self::SubAssign,
+            Self::Mul => Self::MulAssign,
+            Self::Div => Self::DivAssign,
+            Self::Mod => Self::ModAssign,
+            Self::Pow => Self::PowAssign,
+            Self::Concat => Self::ConcatAssign,
+            other => other.clone(),
+        }
+    }
+}
+
+impl std::fmt::Display for BinaryExpressionKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::Add => "+",
+                Self::Sub => "-",
+                Self::Mul => "*",
+                Self::Div => "/",
+                Self::Mod => "%",
+                Self::Pow => "^",
+                Self::Concat => "..",
+
+                Self::AddAssign => "+=",
+                Self::SubAssign => "-=",
+                Self::MulAssign => "*=",
+                Self::DivAssign => "/=",
+                Self::ModAssign => "%=",
+                Self::PowAssign => "^=",
+                Self::ConcatAssign => "..=",
+            }
+        )
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UnaryExpression {
+    kind: UnaryOpKind,
+    value: Expression,
+}
+
+impl std::fmt::Display for UnaryOpKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::Len => "#",
+                Self::Neg => "-",
+
+                // space necessary
+                Self::Not => "not ",
+            }
+        )
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct IndexOp {
+    table: Expression,
+    key: Expression,
+}
+
+#[derive(Debug, Clone)]
+pub struct CallExpression {
+    function: Expression,
+    arguments: Vec<Expression>,
+
+    is_self: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct Function {
+    parameters: Vec<Expression>,
+    body: Box<StatBlock>,
+
+    has_vararg: bool,
+    self_arg: Option<Expression>,
+}
+
+#[derive(Debug, Clone)]
+pub enum Expression {
+    Boolean(Rc<Boolean>),
+    BinaryOp(Rc<BinaryExpression>),
+    UnaryOp(Rc<UnaryExpression>),
+    String(Str),
+    Number(Rc<Number>),
+    Nil(Rc<Nil>),
+    IndexOp(Rc<IndexOp>),
+    Call(Rc<CallExpression>),
+    Function(Rc<Function>),
+}
