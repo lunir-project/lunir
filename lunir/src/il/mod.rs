@@ -208,3 +208,6 @@ pub enum Instruction {
 
     Call(Box<Call>),
 }
+
+#[derive(Debug)]
+pub struct IlChunk(Vec<Instruction>);
