@@ -12,3 +12,10 @@ opt-level = 3
 
 [profile.release]
 lto = "thin"
+
+[profile.actions]
+inherits = "dev"
+opt-level = 0
+
+[profile.actions.package."*"]
+opt-level = 0
