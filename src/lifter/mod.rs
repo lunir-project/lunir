@@ -1,13 +1,13 @@
 use crate::{
-    ast::{expression::*, statement::{*, self}},
-    il::{Constant, Function, Instruction, Table, Value, Return},
+    ast::{
+        expression::*,
+        statement::{self, *},
+    },
+    il::{Constant, Function, Instruction, Return, Table, Value},
 };
 
 use anyhow::{anyhow, Result};
-use std::{
-    collections::{BTreeMap},
-    rc::Rc,
-};
+use std::{collections::BTreeMap, rc::Rc};
 
 #[derive(Default)]
 struct ExpressionStack(Vec<Expression>);
@@ -39,7 +39,7 @@ impl ExpressionStack {
             "No local reference at index {idx} on expression stack"
         ))
     }
-    
+
     fn get_local(&self, idx: usize) -> Result<&Expression> {
         self.0.get(idx).ok_or(anyhow!(
             "No local reference at index {idx} on expression stack"
@@ -90,10 +90,10 @@ impl Lifter {
                 }
 
                 Table::Map(map) => {
-                    let mut result = BTreeMap::new();
+                    let mut result = Vec::<(Expression, Expression)>::with_capacity(map.len());
 
                     for (k, v) in map.iter() {
-                        result.insert(self.value_to_ast(k)?, self.value_to_ast(v)?);
+                        result.push((self.value_to_ast(k)?, self.value_to_ast(v)?));
                     }
 
                     Ok(Expression::Table(Rc::new(TableExpression::HashMap(result))))
@@ -128,7 +128,7 @@ impl Lifter {
     }
 
     pub fn lift(&mut self) -> Result<Box<StatBlock>> {
-        let  mut result = Box::<StatBlock>::default();
+        let mut result = Box::<StatBlock>::default();
 
         for instr in self.instructions.clone().iter() {
             match instr.clone() {
@@ -145,14 +145,17 @@ impl Lifter {
                     *self.expression_stack.get_local_mut(inst.dest)? =
                         self.constant_index_to_ast(inst.constant)?;
                 }
-                
+
                 Instruction::Return(inst) => {
                     self.verify_stack_index(inst.result_start + inst.result_count)?;
                     let mut return_stat = Box::<StatReturn>::default();
 
                     for stack_index in inst.result_start..(inst.result_start + inst.result_count) {
-                        return_stat.results.push(self.expression_stack.get_local(stack_index)?.clone());
+                        return_stat
+                            .results
+                            .push(self.expression_stack.get_local(stack_index)?.clone());
                     }
+
                     result.body.push(Statement::StatReturn(return_stat));
                 }
 
