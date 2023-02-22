@@ -16,7 +16,6 @@ mod tests {
             arguments: vec![Expression::String(Rc::new(Str("it worked!".to_string())))],
         };
 
-        // seems infinite loop lmfao
         let mut reconstructor = source_reconstructor::SourceReconstructor::default();
         reconstructor.visit_mut(&mut expression);
 

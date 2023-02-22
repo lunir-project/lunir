@@ -37,7 +37,7 @@ pub trait Visitor<T: Node>: VisitorMut<T> {
 }
 
 pub trait VisitorMut<T: Node> {
-    fn visit_mut(&mut self, node: &mut T);
+    fn visit_mut(&mut self, node: &T);
 }
 
 pub trait Node
@@ -51,7 +51,7 @@ where
     // bro what
     // it isn't even single stepping into the call
     // it's just infinitely halted LOL
-    fn accept_mut(&mut self, visitor: &mut dyn VisitorMut<Self>) {
+    fn accept_mut(&self, visitor: &mut dyn VisitorMut<Self>) {
         visitor.visit_mut(self);
     }
 }

@@ -59,10 +59,18 @@ impl IdentifierString for String {
             .unwrap_or(&format!("_{result}"))
             .to_string();
 
-        for i in 1..result.len() {
+        let mut i = 1;
+        loop {
+            if i >= result.len() {
+                break;
+            }
+
             if result.chars().nth(i).unwrap() == '_' && result.chars().nth(i - 1).unwrap() == '_' {
                 result.remove(i);
+                i -= 1;
             }
+
+            i += 1;
         }
 
         result
@@ -137,6 +145,7 @@ pub enum BinaryExpressionKind {
 #[derive(Debug, Clone)]
 pub struct BinaryExpression {
     kind: BinaryExpressionKind,
+
     left: Expression,
     right: Expression,
 }
