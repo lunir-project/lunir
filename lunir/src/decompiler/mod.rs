@@ -43,11 +43,11 @@ pub enum BytecodeFormat {
     LuauV3,
 }
 
-use crate::il::{IlChunk, Instruction};
+use crate::il::{IlChunk};
 
 impl Decompiler {
     /// Begins a decompilation job of bytecode with a specified format.
-    pub fn decompile(bytecode: impl AsRef<[u8]>, format: BytecodeFormat) -> String {
+    pub fn decompile(_bytecode: impl AsRef<[u8]>, format: BytecodeFormat) -> String {
         match format {
             BytecodeFormat::LuaP => todo!(),
             BytecodeFormat::LuaQ => todo!(),
@@ -66,7 +66,7 @@ impl Decompiler {
         bytecode: Box<dyn AsRef<[u8]>>,
         lifter: F,
     ) -> String {
-        let il = lifter(bytecode);
+        let _il = lifter(bytecode);
 
         todo!()
     }
