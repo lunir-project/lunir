@@ -35,21 +35,15 @@ impl ExpressionStack {
     }
 
     fn get_local_mut(&mut self, idx: usize) -> Result<&mut Expression> {
-        match self.0.get_mut(idx) {
-            Some(expr) => Ok(expr),
-            None => Err(anyhow!(
-                "No local reference at index {idx} on expression stack"
-            )),
-        }
+        self.0.get_mut(idx).ok_or(anyhow!(
+            "No local reference at index {idx} on expression stack"
+        ))
     }
 
     fn get_local(&self, idx: usize) -> Result<&Expression> {
-        match self.0.get(idx) {
-            Some(expr) => Ok(expr),
-            None => Err(anyhow!(
-                "No local reference at index {idx} on expression stack"
-            )),
-        }
+        self.0.get(idx).ok_or(anyhow!(
+            "No local reference at index {idx} on expression stack"
+        ))
     }
 }
 
@@ -84,10 +78,7 @@ impl Lifter {
                 Table::Array(a) => {
                     let vec = a
                         .iter()
-                        .map(|c| match self.value_to_ast(c) {
-                            Ok(e) => Ok(e),
-                            Err(e) => return Err(anyhow!("{:?}", e)),
-                        })
+                        .map(|c| self.value_to_ast(c).map_err(|e| anyhow!("{e:?}")))
                         .collect::<Vec<_>>();
 
                     if vec.iter().any(|e| e.is_err()) {
@@ -112,9 +103,16 @@ impl Lifter {
     }
 
     fn constant_index_to_ast(&self, idx: usize) -> Result<Expression> {
+        let a: Result<Expression> = self
+            .function
+            .constants
+            .get(idx)
+            .map(|c| Ok(self.constant_to_ast(c)))
+            .ok_or(Err(anyhow!("what")));
+
         match self.function.constants.get(idx) {
             Some(c) => self.constant_to_ast(c),
-            None => Err(anyhow!("Constant index {} out of range", idx)),
+            None => Err(anyhow!("what")),
         }
     }
 
