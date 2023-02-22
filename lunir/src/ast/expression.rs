@@ -23,6 +23,8 @@
 use crate::ast::statement::*;
 use crate::il::UnaryOpKind;
 
+use itertools::Itertools;
+
 use std::collections::BTreeMap;
 use std::rc::Rc;
 
@@ -34,15 +36,9 @@ pub trait IdentifierString {
 
 impl IdentifierString for String {
     fn can_identify(&self) -> bool {
-        if self.is_empty() || self.chars().nth(0).unwrap().is_digit(10) {
-            return false;
-        }
-
-        if self.chars().any(|c| !c.is_alphanumeric() && c != '_') {
-            return false;
-        }
-
-        true
+        !(self.is_empty()
+            || self.chars().next().unwrap().is_ascii_digit()
+            || self.chars().any(|c| !c.is_alphanumeric() && c != '_'))
     }
 
     fn sanitize_identifier(&self) -> String {
@@ -55,53 +51,32 @@ impl IdentifierString for String {
             })
             .collect::<String>();
 
-        result = (!result.is_empty())
-            .then_some(&result)
-            .unwrap_or(&format!("_{result}"))
-            .to_string();
+        result = if !result.is_empty() {
+            result
+        } else {
+            format!("_{result}")
+        };
 
-        let mut i = 1;
-        loop {
-            if i >= result.len() {
-                break;
-            }
-
-            if result.chars().nth(i).unwrap() == '_' && result.chars().nth(i - 1).unwrap() == '_' {
-                result.remove(i);
-            } else {
-                i += 1;
-            }
-        }
+        let result = result
+            .chars()
+            .dedup_by(|&a, &b| a == '_' && a == b)
+            .collect::<String>();
 
         result
     }
 
     fn sanitize_special(&self) -> String {
-        let special_chars = {
-            let mut tmp = std::collections::HashMap::new();
-
-            tmp.insert('\n', "\\n");
-            tmp.insert('\r', "\\r");
-            tmp.insert('\t', "\\t");
-            tmp.insert('\"', "\\\"");
-            tmp.insert('\\', "\\\\");
-
-            tmp
-        };
-
-        let mut result = String::with_capacity(self.len());
-
-        for c in self.chars() {
-            if special_chars.contains_key(&c) {
-                result.push_str(special_chars.get(&c).unwrap());
-            } else if c >= ' ' && c <= '~' {
-                result.push(c);
-            } else {
-                result.push_str(format!("\\{}", c as u32).as_str());
-            }
-        }
-
-        result
+        self.chars()
+            .map(|c| match c {
+                '\n' => r#"\n"#.to_string(),
+                '\r' => r#"\r"#.to_string(),
+                '\t' => r#"\t"#.to_string(),
+                '\"' => r#"\""#.to_string(),
+                '\\' => r#"\\"#.to_string(),
+                c if (' '..='~').contains(&c) => c.to_string(),
+                _ => format!(r#"\{}"#, c as u32),
+            })
+            .collect()
     }
 }
 
@@ -123,10 +98,10 @@ impl Ord for Number {
 
         match self.partial_cmp(&min) {
             Some(Ordering::Greater) => match self.partial_cmp(&max) {
-                Some(Ordering::Less) => return self,
-                _ => return max,
+                Some(Ordering::Less) => self,
+                _ => max,
             },
-            _ => return min,
+            _ => min,
         }
     }
 
