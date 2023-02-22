@@ -103,16 +103,9 @@ impl Lifter {
     }
 
     fn constant_index_to_ast(&self, idx: usize) -> Result<Expression> {
-        let a: Result<Expression> = self
-            .function
-            .constants
-            .get(idx)
-            .map(|c| Ok(self.constant_to_ast(c)))
-            .ok_or(Err(anyhow!("what")));
-
         match self.function.constants.get(idx) {
             Some(c) => self.constant_to_ast(c),
-            None => Err(anyhow!("what")),
+            None => Err(anyhow!("Constant index {idx} out of range")),
         }
     }
 
