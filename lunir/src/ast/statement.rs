@@ -22,18 +22,18 @@
 
 use super::expression::Expression;
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, PartialEq, PartialOrd, Eq, Ord)]
 pub struct StatBlock {
     pub body: Vec<Statement>,
 }
 
 // This exists because some things like call and function can be both statements and expressions
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub struct StatExpr {
     pub value: Expression,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub enum Statement {
     StatBlock(Box<StatBlock>),
     StatExpr(Box<StatExpr>),

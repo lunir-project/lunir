@@ -86,7 +86,7 @@ pub struct BinaryOp {
     pub right: Value,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub enum UnaryOpKind {
     Len,
     Not,

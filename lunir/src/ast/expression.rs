@@ -23,6 +23,7 @@
 use crate::ast::statement::*;
 use crate::il::UnaryOpKind;
 
+use std::collections::BTreeMap;
 use std::rc::Rc;
 
 pub trait IdentifierString {
@@ -33,7 +34,6 @@ pub trait IdentifierString {
 
 impl IdentifierString for String {
     fn can_identify(&self) -> bool {
-        
         if self.is_empty() || self.chars().nth(0).unwrap().is_digit(10) {
             return false;
         }
@@ -105,25 +105,63 @@ impl IdentifierString for String {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub struct Nil;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct Number(pub f64);
+impl Eq for Number {
+    fn assert_receiver_is_total_eq(&self) {}
+}
 
-#[derive(Debug, Clone)]
+impl Ord for Number {
+    fn clamp(self, min: Self, max: Self) -> Self
+    where
+        Self: Sized,
+    {
+        use std::cmp::Ordering;
+
+        match self.partial_cmp(&min) {
+            Some(Ordering::Greater) => match self.partial_cmp(&max) {
+                Some(Ordering::Less) => return self,
+                _ => return max,
+            },
+            _ => return min,
+        }
+    }
+
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.partial_cmp(other).unwrap()
+    }
+
+    fn max(self, other: Self) -> Self
+    where
+        Self: Sized,
+    {
+        std::cmp::max(self, other)
+    }
+
+    fn min(self, other: Self) -> Self
+    where
+        Self: Sized,
+    {
+        std::cmp::min(self, other)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub struct Boolean(pub bool);
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub struct Str(pub String);
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub struct GlobalSymbol(pub String);
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub struct Identifier(pub String);
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub enum BinaryExpressionKind {
     Add,
     Sub,
@@ -142,7 +180,7 @@ pub enum BinaryExpressionKind {
     ConcatAssign,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub struct BinaryExpression {
     kind: BinaryExpressionKind,
 
@@ -191,7 +229,7 @@ impl std::fmt::Display for BinaryExpressionKind {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub struct UnaryExpression {
     kind: UnaryOpKind,
     value: Expression,
@@ -213,19 +251,19 @@ impl std::fmt::Display for UnaryOpKind {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub enum TableExpression {
-    HashMap(std::collections::HashMap<Expression, Expression>),
+    HashMap(BTreeMap<Expression, Expression>),
     Array(Vec<Expression>),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub struct IndexOp {
     key: Expression,
     table: Expression,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub struct CallExpression {
     pub arguments: Vec<Expression>,
     pub function: Expression,
@@ -233,7 +271,7 @@ pub struct CallExpression {
     pub is_self: bool,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub struct FunctionExpression {
     body: Box<StatBlock>,
     has_vararg: bool,
@@ -242,7 +280,7 @@ pub struct FunctionExpression {
     self_arg: Option<Expression>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub enum Expression {
     Boolean(Rc<Boolean>),
     BinaryOp(Rc<BinaryExpression>),

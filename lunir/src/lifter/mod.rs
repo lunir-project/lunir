@@ -1,10 +1,13 @@
 use crate::{
     ast::{expression::*, statement::*, tree::*},
-    il::{Constant, Function, Instruction, Value},
+    il::{Constant, Function, Instruction, Table, Value},
 };
 
 use anyhow::{anyhow, Result};
-use std::rc::Rc;
+use std::{
+    collections::{BTreeMap, HashMap},
+    rc::Rc,
+};
 
 #[derive(Default)]
 struct ExpressionStack(Vec<Expression>);
@@ -31,8 +34,17 @@ impl ExpressionStack {
         self.0.push(expr);
     }
 
-    fn get_local(&mut self, idx: usize) -> Result<&mut Expression> {
+    fn get_local_mut(&mut self, idx: usize) -> Result<&mut Expression> {
         match self.0.get_mut(idx) {
+            Some(expr) => Ok(expr),
+            None => Err(anyhow!(
+                "No local reference at index {idx} on expression stack"
+            )),
+        }
+    }
+
+    fn get_local(&self, idx: usize) -> Result<&Expression> {
+        match self.0.get(idx) {
             Some(expr) => Ok(expr),
             None => Err(anyhow!(
                 "No local reference at index {idx} on expression stack"
@@ -68,10 +80,34 @@ impl Lifter {
             Constant::String(ref s) => Ok(Expression::String(Rc::new(Str(s.clone())))),
             Constant::Number(n) => Ok(Expression::Number(Rc::new(Number(*n)))),
             Constant::Function(f) => Ok(Expression::Function(self.make_function(f))),
-            Constant::Table(t) => {
-                todo!()
-            }
-            _ => Err(anyhow!("Constant {:?} not implemented yet", constant)),
+            Constant::Table(t) => match t {
+                Table::Array(a) => {
+                    let vec = a
+                        .iter()
+                        .map(|c| match self.value_to_ast(c) {
+                            Ok(e) => Ok(e),
+                            Err(e) => return Err(anyhow!("{:?}", e)),
+                        })
+                        .collect::<Vec<_>>();
+
+                    if vec.iter().any(|e| e.is_err()) {
+                        return Err(anyhow!("Unimplemented value in table"));
+                    }
+
+                    let vec = vec.into_iter().map(|c| c.unwrap()).collect::<Vec<_>>();
+                    Ok(Expression::Table(Rc::new(TableExpression::Array(vec))))
+                }
+
+                Table::Map(map) => {
+                    let mut result = BTreeMap::new();
+
+                    for (k, v) in map.iter() {
+                        result.insert(self.value_to_ast(k)?, self.value_to_ast(v)?);
+                    }
+
+                    Ok(Expression::Table(Rc::new(TableExpression::HashMap(result))))
+                }
+            },
         }
     }
 
@@ -82,7 +118,7 @@ impl Lifter {
         }
     }
 
-    fn value_to_ast(&mut self, value: &Value) -> Result<Expression> {
+    fn value_to_ast(&self, value: &Value) -> Result<Expression> {
         match *value {
             Value::Boolean(b) => Ok(Expression::Boolean(Rc::new(Boolean(b)))),
             Value::ConstantIndex(i) => self.constant_index_to_ast(i),
@@ -108,13 +144,14 @@ impl Lifter {
                 Instruction::Load(inst) => {
                     self.verify_stack_index(inst.dest)?;
 
-                    *self.expression_stack.get_local(inst.dest)? = self.value_to_ast(&inst.src)?;
+                    *self.expression_stack.get_local_mut(inst.dest)? =
+                        self.value_to_ast(&inst.src)?;
                 }
 
                 Instruction::GetGlobal(inst) => {
                     self.verify_stack_index(inst.dest)?;
 
-                    *self.expression_stack.get_local(inst.dest)? =
+                    *self.expression_stack.get_local_mut(inst.dest)? =
                         self.constant_index_to_ast(inst.constant)?;
                 }
 
