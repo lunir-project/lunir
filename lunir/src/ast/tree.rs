@@ -48,9 +48,6 @@ where
         visitor.visit(self);
     }
 
-    // bro what
-    // it isn't even single stepping into the call
-    // it's just infinitely halted LOL
     fn accept_mut(&self, visitor: &mut dyn VisitorMut<Self>) {
         visitor.visit_mut(self);
     }
@@ -77,6 +74,8 @@ ast_nodes!(
     FunctionExpression,
     GlobalSymbol,
     Identifier,
+    TableExpression,
+
     // Statements
     StatBlock,
     StatExpr,

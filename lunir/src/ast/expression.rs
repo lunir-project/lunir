@@ -33,6 +33,7 @@ pub trait IdentifierString {
 
 impl IdentifierString for String {
     fn can_identify(&self) -> bool {
+        
         if self.is_empty() || self.chars().nth(0).unwrap().is_digit(10) {
             return false;
         }
@@ -67,10 +68,9 @@ impl IdentifierString for String {
 
             if result.chars().nth(i).unwrap() == '_' && result.chars().nth(i - 1).unwrap() == '_' {
                 result.remove(i);
-                i -= 1;
+            } else {
+                i += 1;
             }
-
-            i += 1;
         }
 
         result
@@ -214,6 +214,12 @@ impl std::fmt::Display for UnaryOpKind {
 }
 
 #[derive(Debug, Clone)]
+pub enum TableExpression {
+    HashMap(std::collections::HashMap<Expression, Expression>),
+    Array(Vec<Expression>),
+}
+
+#[derive(Debug, Clone)]
 pub struct IndexOp {
     key: Expression,
     table: Expression,
@@ -249,4 +255,5 @@ pub enum Expression {
     Function(Rc<FunctionExpression>),
     GlobalSymbol(Rc<GlobalSymbol>),
     Identifier(Rc<Identifier>),
+    Table(Rc<TableExpression>),
 }

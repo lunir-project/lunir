@@ -57,13 +57,20 @@ pub struct Lifter {
 }
 
 impl Lifter {
+    fn make_function(&self, func: &Function) -> Rc<FunctionExpression> {
+        todo!();
+    }
+
     fn constant_to_ast(&self, constant: &Constant) -> Result<Expression> {
         match constant {
             Constant::Boolean(b) => Ok(Expression::Boolean(Rc::new(Boolean(*b)))),
             Constant::Nil => Ok(Expression::Nil(Rc::new(Nil))),
             Constant::String(ref s) => Ok(Expression::String(Rc::new(Str(s.clone())))),
             Constant::Number(n) => Ok(Expression::Number(Rc::new(Number(*n)))),
-
+            Constant::Function(f) => Ok(Expression::Function(self.make_function(f))),
+            Constant::Table(t) => {
+                todo!()
+            }
             _ => Err(anyhow!("Constant {:?} not implemented yet", constant)),
         }
     }
@@ -82,8 +89,6 @@ impl Lifter {
             Value::Immediate(i) => Ok(Expression::Number(Rc::new(Number(i as f64)))),
             Value::Nil => Ok(Expression::Nil(Rc::new(Nil))),
             Value::StackIndex(i) => Ok(self.expression_stack.get_local(i)?.clone()),
-
-            _ => Err(anyhow!("Value {:?} not implemented yet", value)),
         }
     }
 
@@ -96,7 +101,6 @@ impl Lifter {
     }
 
     pub fn lift(&mut self) -> Result<Box<StatBlock>> {
-        // Where our statements will go
         let mut result = Box::new(StatBlock::default());
 
         for instr in self.instructions.clone().iter() {
@@ -104,8 +108,7 @@ impl Lifter {
                 Instruction::Load(inst) => {
                     self.verify_stack_index(inst.dest)?;
 
-                    let expr = self.value_to_ast(&inst.src)?;
-                    *self.expression_stack.get_local(inst.dest)? = expr;
+                    *self.expression_stack.get_local(inst.dest)? = self.value_to_ast(&inst.src)?;
                 }
 
                 Instruction::GetGlobal(inst) => {
