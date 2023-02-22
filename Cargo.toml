@@ -1,8 +1,15 @@
-[workspace]
+[package]
+name = "lunir"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.58.1"
 
-members = [
-  "lunir"
-]
+[package.metadata.msrv]
+msrv = "1.58.1"
+
+[dependencies]
+anyhow = "1.0.69"
+itertools = "0.10.5"
 
 [profile.dev]
 opt-level = 1
