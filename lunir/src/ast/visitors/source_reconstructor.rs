@@ -20,19 +20,19 @@ impl SourceReconstructor {
 
 impl VisitorMut<GlobalSymbol> for SourceReconstructor {
     fn visit_mut(&mut self, node: &GlobalSymbol) {
-        self.source.push_str(&node.0)
+        self.source.push_str(&node.0);
     }
 }
 
 impl VisitorMut<Identifier> for SourceReconstructor {
     fn visit_mut(&mut self, node: &Identifier) {
-        self.source.push_str(&node.0)
+        self.source.push_str(&node.0);
     }
 }
 
 impl VisitorMut<Str> for SourceReconstructor {
     fn visit_mut(&mut self, node: &Str) {
-        self.source.push_str(&format!(r#""{}""#, node.0).as_str())
+        self.source.push_str(format!(r#""{}""#, node.0).as_str());
     }
 }
 
