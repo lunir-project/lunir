@@ -20,7 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
 pub mod ast;
+pub mod decompiler;
 pub mod il;
-
+pub mod lifter;
+pub mod prelude;

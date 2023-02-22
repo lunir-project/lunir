@@ -23,11 +23,64 @@
 // ok we need to write some expressions and statements
 // ok
 
+use crate::ast::{expression::Expression, statement::Statement};
+
 pub enum NodeKind {
-    
+    Expression(Expression),
+    Statement(Statement),
 }
 
-pub struct Node {
-    kind: Box<NodeKind>,
-    children: Vec<Node>,
+use super::{expression::*, statement::*};
+
+pub trait Visitor<T: Node>: VisitorMut<T> {
+    fn visit(&self, node: &T);
 }
+
+pub trait VisitorMut<T: Node> {
+    fn visit_mut(&mut self, node: &mut T);
+}
+
+pub trait Node
+where
+    Self: Sized,
+{
+    fn accept(&self, visitor: &dyn Visitor<Self>) {
+        visitor.visit(self);
+    }
+
+    // bro what
+    // it isn't even single stepping into the call
+    // it's just infinitely halted LOL
+    fn accept_mut(&mut self, visitor: &mut dyn VisitorMut<Self>) {
+        visitor.visit_mut(self);
+    }
+}
+
+macro_rules! ast_nodes {
+    ($($ty:ty),*) => {
+        $(
+            impl Node for $ty {}
+        )*
+    };
+}
+
+ast_nodes!(
+    // Expressions
+    Nil,
+    Number,
+    Boolean,
+    Str,
+    BinaryExpression,
+    UnaryExpression,
+    IndexOp,
+    CallExpression,
+    FunctionExpression,
+    GlobalSymbol,
+    Identifier,
+    // Statements
+    StatBlock,
+    StatExpr,
+    // Both
+    Expression,
+    Statement
+);

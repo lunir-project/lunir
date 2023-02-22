@@ -1,0 +1,31 @@
+pub mod source_reconstructor;
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        ast::{expression::*, statement::*, tree::*, visitors::*},
+        il::*,
+    };
+    use std::rc::Rc;
+
+    #[test]
+    fn test_ast_to_lua() {
+        let mut expression = CallExpression {
+            is_self: false,
+            function: Expression::GlobalSymbol(Rc::new(GlobalSymbol("print".to_string()))),
+            arguments: vec![Expression::String(Rc::new(Str("it worked!".to_string())))],
+        };
+
+        // seems infinite loop lmfao
+        let mut reconstructor = source_reconstructor::SourceReconstructor::default();
+        reconstructor.visit_mut(&mut expression);
+
+        assert_eq!(reconstructor.source(), r#"print("it worked!")"#);
+
+        let mut reconstructor = source_reconstructor::SourceReconstructor::default();
+        let mut wrapped_expression = Expression::Call(Rc::new(expression));
+
+        reconstructor.visit_mut(&mut wrapped_expression);
+        assert_eq!(reconstructor.source(), r#"print("it worked!")"#);
+    }
+}

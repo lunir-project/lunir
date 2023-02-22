@@ -20,12 +20,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#[derive(Debug, Clone)]
+use super::expression::Expression;
+
+#[derive(Debug, Clone, Default)]
 pub struct StatBlock {
     pub body: Vec<Statement>,
+}
+
+// This exists because some things like call and function can be both statements and expressions
+#[derive(Debug, Clone)]
+pub struct StatExpr {
+    pub value: Expression,
 }
 
 #[derive(Debug, Clone)]
 pub enum Statement {
     StatBlock(Box<StatBlock>),
+    StatExpr(Box<StatExpr>),
 }

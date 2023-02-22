@@ -49,21 +49,21 @@ pub enum Constant {
 
 #[derive(Debug, Clone)]
 pub struct Load {
-    dest: usize,
-    src: Value,
+    pub dest: usize,
+    pub src: Value,
 }
 
 #[derive(Debug, Clone)]
 pub struct GetGlobal {
-    dest: usize,
-    constant: usize,
+    pub dest: usize,
+    pub constant: usize,
 }
 
 #[derive(Debug, Clone)]
 pub struct GetTable {
-    dest: usize,
-    source: usize,
-    index: Value,
+    pub dest: usize,
+    pub source: usize,
+    pub index: Value,
 }
 
 #[derive(Debug, Clone)]
@@ -79,11 +79,11 @@ pub enum BinaryOpKind {
 
 #[derive(Debug, Clone)]
 pub struct BinaryOp {
-    kind: BinaryOpKind,
-    dest: usize,
+    pub ind: BinaryOpKind,
+    pub dest: usize,
 
-    left: Value,
-    right: Value,
+    pub left: Value,
+    pub right: Value,
 }
 
 #[derive(Debug, Clone)]
@@ -95,10 +95,10 @@ pub enum UnaryOpKind {
 
 #[derive(Debug, Clone)]
 pub struct UnaryOp {
-    kind: UnaryOpKind,
-    dest: usize,
+    pub kind: UnaryOpKind,
+    pub dest: usize,
 
-    value: Value,
+    pub value: Value,
 }
 
 #[derive(Debug, Clone)]
@@ -115,59 +115,59 @@ pub enum ConditionalKind {
 }
 
 #[derive(Debug, Clone)]
-struct Conditional {
-    kind: ConditionalKind,
-    dest: usize,
+pub struct Conditional {
+    pub kind: ConditionalKind,
+    pub dest: usize,
 
-    left: Value,
-    right: Value,
+    pub left: Value,
+    pub right: Value,
 }
 
 #[derive(Debug, Clone)]
-struct JumpBranch {
-    start: usize,
-    end: usize,
-    offset: isize,
+pub struct JumpBranch {
+    pub start: usize,
+    pub end: usize,
+    pub offset: isize,
 }
 
 // Unconditional jump
 #[derive(Debug, Clone)]
 pub struct Jump {
-    branch: JumpBranch,
+    pub branch: JumpBranch,
 }
 
 #[derive(Debug, Clone)]
 pub struct ConditionalJump {
-    branch: JumpBranch,
-    condition: Conditional,
+    pub branch: JumpBranch,
+    pub condition: Conditional,
 }
 
 #[derive(Debug, Clone)]
 pub struct NewTable {
-    dest: usize,
+    pub dest: usize,
 
-    table_size: usize,
-    array_size: usize,
+    pub table_size: usize,
+    pub array_size: usize,
 }
 
 #[derive(Debug, Clone)]
-enum OptVariable {
+pub enum OptVariable {
     Variable,
     Number(usize),
 }
 
 #[derive(Debug, Clone)]
 pub struct Call {
-    callee: usize,
+    pub callee: usize,
 
-    num_args: OptVariable,
-    num_returns: OptVariable,
+    pub num_args: OptVariable,
+    pub num_returns: OptVariable,
 }
 
 #[derive(Debug, Clone)]
 pub struct Return {
-    from: usize,
-    count: usize,
+    pub from: usize,
+    pub count: usize,
 }
 
 #[repr(u8)]
@@ -180,14 +180,14 @@ pub enum VarargTag {
 
 #[derive(Debug, Clone)]
 pub struct Function {
-    constants: Vec<Constant>,
-    code: Vec<u8>,
-    is_variadic: VarargTag,
-    lineinfo: Vec<u32>,
-    name: Option<String>,
-    num_upvalues: u8,
-    num_parameters: u8,
-    max_stack_size: u8,
+    pub constants: Vec<Constant>,
+    pub code: Vec<u8>,
+    pub is_variadic: VarargTag,
+    pub lineinfo: Vec<u32>,
+    pub name: Option<String>,
+    pub num_upvalues: u8,
+    pub num_parameters: u8,
+    pub max_stack_size: u8,
 }
 
 #[derive(Debug, Clone)]

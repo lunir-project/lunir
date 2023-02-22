@@ -101,13 +101,19 @@ impl IdentifierString for String {
 pub struct Nil;
 
 #[derive(Debug, Clone)]
-pub struct Number(f64);
+pub struct Number(pub f64);
 
 #[derive(Debug, Clone)]
-pub struct Boolean(bool);
+pub struct Boolean(pub bool);
 
 #[derive(Debug, Clone)]
-pub struct Str(String);
+pub struct Str(pub String);
+
+#[derive(Debug, Clone)]
+pub struct GlobalSymbol(pub String);
+
+#[derive(Debug, Clone)]
+pub struct Identifier(pub String);
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum BinaryExpressionKind {
@@ -206,14 +212,14 @@ pub struct IndexOp {
 
 #[derive(Debug, Clone)]
 pub struct CallExpression {
-    arguments: Vec<Expression>,
-    function: Expression,
+    pub arguments: Vec<Expression>,
+    pub function: Expression,
 
-    is_self: bool,
+    pub is_self: bool,
 }
 
 #[derive(Debug, Clone)]
-pub struct Function {
+pub struct FunctionExpression {
     body: Box<StatBlock>,
     has_vararg: bool,
 
@@ -231,5 +237,7 @@ pub enum Expression {
     Nil(Rc<Nil>),
     IndexOp(Rc<IndexOp>),
     Call(Rc<CallExpression>),
-    Function(Rc<Function>),
+    Function(Rc<FunctionExpression>),
+    GlobalSymbol(Rc<GlobalSymbol>),
+    Identifier(Rc<Identifier>),
 }
