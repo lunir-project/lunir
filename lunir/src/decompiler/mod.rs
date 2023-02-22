@@ -23,10 +23,13 @@ impl DecompilerBuilder {
     }
 }
 
-// now we gotta make the visitor to build our lua code
 pub struct Decompiler {
     settings: DecompilerSettings,
 }
+
+// Can be replaced with a trait of the same name to allow bytecode
+// formats to be structs but I'm not sure about that, I like the simplicity
+// of just passing an arbitrary function.
 
 /// The format of bytecode specific to a certain Lua version.
 pub enum BytecodeFormat {
@@ -40,7 +43,7 @@ pub enum BytecodeFormat {
     LuauV3,
 }
 
-use crate::il::Instruction;
+use crate::il::{IlChunk, Instruction};
 
 impl Decompiler {
     /// Begins a decompilation job of bytecode with a specified format.
@@ -59,11 +62,12 @@ impl Decompiler {
 
     /// Begins a decompilation job with a custom lifter to allow for
     /// decompilation of unsupported bytecode formats.
-    pub fn decompile_with_lifter<F: Fn(Box<dyn AsRef<[u8]>>) -> Vec<Instruction>>(
+    pub fn decompile_with_lifter<F: Fn(Box<dyn AsRef<[u8]>>) -> IlChunk>(
         bytecode: Box<dyn AsRef<[u8]>>,
         lifter: F,
     ) -> String {
         let il = lifter(bytecode);
+
         todo!()
     }
 }
