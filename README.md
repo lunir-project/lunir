@@ -9,3 +9,6 @@ The Lua Universal Intermediate Representation, designed to facilitate easy compi
 [mit-url]: https://github.com/lunir-project/lunir/blob/main/LICENSE
 [build-badge]: https://github.com/lunir-project/lunir/actions/workflows/rust.yml/badge.svg
 [build-url]: https://github.com/lunir-project/lunir/actions/workflows/rust.yml
+
+## MSRV
+The Minimum Supported Rust Version for this crate is **1.58.1**.
