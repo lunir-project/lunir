@@ -242,7 +242,7 @@ pub struct IndexOp {
 pub struct CallExpression {
     pub arguments: Vec<Expression>,
     pub function: Expression,
-
+    
     pub is_self: bool,
 }
 
@@ -262,7 +262,7 @@ pub enum Expression {
     UnaryOp(Rc<UnaryExpression>),
     String(Rc<Str>),
     Number(Rc<Number>),
-    Nil(Rc<Nil>),
+    Nil(Rc<Nil>), 
     IndexOp(Rc<IndexOp>),
     Call(Rc<CallExpression>),
     Function(Rc<FunctionExpression>),

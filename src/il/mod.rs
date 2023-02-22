@@ -166,8 +166,8 @@ pub struct Call {
 
 #[derive(Debug, Clone)]
 pub struct Return {
-    pub from: usize,
-    pub count: usize,
+    pub result_start: usize,
+    pub result_count: usize,
 }
 
 #[repr(u8)]
@@ -185,8 +185,8 @@ pub struct Function {
     pub is_variadic: VarargTag,
     pub lineinfo: Vec<u32>,
     pub name: Option<String>,
-    pub num_upvalues: u8,
-    pub num_parameters: u8,
+    pub upvalue_count: u8,
+    pub param_count: u8,
     pub max_stack_size: u8,
 }
 

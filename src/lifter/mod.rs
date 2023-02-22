@@ -1,6 +1,6 @@
 use crate::{
-    ast::{expression::*, statement::*},
-    il::{Constant, Function, Instruction, Table, Value},
+    ast::{expression::*, statement::{*, self}},
+    il::{Constant, Function, Instruction, Table, Value, Return},
 };
 
 use anyhow::{anyhow, Result};
@@ -39,7 +39,7 @@ impl ExpressionStack {
             "No local reference at index {idx} on expression stack"
         ))
     }
-
+    
     fn get_local(&self, idx: usize) -> Result<&Expression> {
         self.0.get(idx).ok_or(anyhow!(
             "No local reference at index {idx} on expression stack"
@@ -128,7 +128,7 @@ impl Lifter {
     }
 
     pub fn lift(&mut self) -> Result<Box<StatBlock>> {
-        let result = Box::<StatBlock>::default();
+        let  mut result = Box::<StatBlock>::default();
 
         for instr in self.instructions.clone().iter() {
             match instr.clone() {
@@ -144,6 +144,16 @@ impl Lifter {
 
                     *self.expression_stack.get_local_mut(inst.dest)? =
                         self.constant_index_to_ast(inst.constant)?;
+                }
+                
+                Instruction::Return(inst) => {
+                    self.verify_stack_index(inst.result_start + inst.result_count)?;
+                    let mut return_stat = Box::<StatReturn>::default();
+
+                    for stack_index in inst.result_start..(inst.result_start + inst.result_count) {
+                        return_stat.results.push(self.expression_stack.get_local(stack_index)?.clone());
+                    }
+                    result.body.push(Statement::StatReturn(return_stat));
                 }
 
                 _ => return Err(anyhow!("Instruction {:?} not supported", instr)),

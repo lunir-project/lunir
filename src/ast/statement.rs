@@ -26,6 +26,10 @@ use super::expression::Expression;
 pub struct StatBlock {
     pub body: Vec<Statement>,
 }
+#[derive(Debug, Clone, Default, PartialEq, PartialOrd, Eq, Ord)]
+pub struct StatReturn {
+    pub results: Vec<Expression>,
+}
 
 // This exists because some things like call and function can be both statements and expressions
 #[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord)]
@@ -37,4 +41,5 @@ pub struct StatExpr {
 pub enum Statement {
     StatBlock(Box<StatBlock>),
     StatExpr(Box<StatExpr>),
+    StatReturn(Box<StatReturn>),
 }
