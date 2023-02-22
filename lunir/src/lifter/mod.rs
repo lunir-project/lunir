@@ -137,7 +137,7 @@ impl Lifter {
     }
 
     pub fn lift(&mut self) -> Result<Box<StatBlock>> {
-        let mut result = Box::new(StatBlock::default());
+        let mut result = Box::<StatBlock>::default();
 
         for instr in self.instructions.clone().iter() {
             match instr.clone() {
