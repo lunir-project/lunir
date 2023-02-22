@@ -75,7 +75,6 @@ ast_nodes!(
     GlobalSymbol,
     Identifier,
     TableExpression,
-
     // Statements
     StatBlock,
     StatExpr,
