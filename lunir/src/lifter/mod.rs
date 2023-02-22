@@ -1,11 +1,11 @@
 use crate::{
-    ast::{expression::*, statement::*, tree::*},
+    ast::{expression::*, statement::*},
     il::{Constant, Function, Instruction, Table, Value},
 };
 
 use anyhow::{anyhow, Result};
 use std::{
-    collections::{BTreeMap, HashMap},
+    collections::{BTreeMap},
     rc::Rc,
 };
 
@@ -63,7 +63,7 @@ pub struct Lifter {
 }
 
 impl Lifter {
-    fn make_function(&self, func: &Function) -> Rc<FunctionExpression> {
+    fn make_function(&self, _func: &Function) -> Rc<FunctionExpression> {
         todo!();
     }
 
@@ -128,7 +128,7 @@ impl Lifter {
     }
 
     pub fn lift(&mut self) -> Result<Box<StatBlock>> {
-        let mut result = Box::<StatBlock>::default();
+        let result = Box::<StatBlock>::default();
 
         for instr in self.instructions.clone().iter() {
             match instr.clone() {
