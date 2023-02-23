@@ -44,12 +44,13 @@ impl std::fmt::Debug for ExpressionStack {
                 .iter()
                 .enumerate()
                 .rev()
-                .map(|(index, expression)| format!("{index}:{expression:#?}"))
+                .map(|(index, expression)| format!("{index}:{expression:8?}"))
                 .collect::<Vec<_>>()
                 .join("\n")
         )
     }
 }
+
 impl ExpressionStack {
     fn push_local(&mut self, expr: Expression) {
         // for now just push directly
