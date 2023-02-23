@@ -71,15 +71,6 @@ impl ExpressionStack {
 }
 
 pub struct Lifter {
-    // Okay so we gotta just improvise as we go for the most part
-    // I think we can have some pre-processing passes as well to identify locals and such
-    // Well it has to be unless u just want a single giant function
-    // I might have more in order to shadow certain variables and do some internals
-    // might even use handlers but idk
-
-    // im not entirely convinced with this being a struct to begin with, but we'll see
-    // youll just have that function in the impl block xd
-    // we'll see
     expression_stack: ExpressionStack,
     instructions: Vec<Instruction>,
     function: Function,
