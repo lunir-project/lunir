@@ -2,10 +2,13 @@
 name = "lunir"
 version = "0.1.0"
 edition = "2021"
+
 description = "A universal intermediate representation oriented towards Lua."
 homepage = "https://github.com/lunir-project/lunir"
 repository = "https://github.com/lunir-project/lunir"
 readme = "README.md"
+license = "MIT"
+
 rust-version = "1.58.1"
 
 [package.metadata.msrv]
