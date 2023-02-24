@@ -30,17 +30,17 @@ pub struct CompilerBuilder {
 }
 
 impl CompilerBuilder {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self::default()
     }
 
-    fn with_settings(settings: CompilerSettings) -> Self {
+    pub fn with_settings(settings: CompilerSettings) -> Self {
         Self {
             settings: Some(settings),
         }
     }
 
-    fn settings(&mut self, settings: CompilerSettings) -> &mut Self {
+    pub fn settings(&mut self, settings: CompilerSettings) -> &mut Self {
         self.settings = Some(settings);
 
         self

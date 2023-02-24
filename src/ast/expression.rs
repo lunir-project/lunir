@@ -24,8 +24,6 @@ use crate::ast::statement::*;
 use crate::il::UnaryOpKind;
 
 use itertools::Itertools;
-
-use std::collections::BTreeMap;
 use std::rc::Rc;
 
 pub trait IdentifierString {

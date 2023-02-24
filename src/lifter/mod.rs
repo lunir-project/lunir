@@ -136,7 +136,7 @@ impl Lifter {
 
     fn verify_stack_index(&self, index: usize) -> Result<()> {
         if index >= self.expression_stack.0.len() {
-            return Err(anyhow!("Expression stack index {} out of range", index));
+            return Err(anyhow!("Expression stack index {index} out of range"));
         }
 
         Ok(())
@@ -174,7 +174,7 @@ impl Lifter {
                     result.body.push(Statement::StatReturn(return_stat));
                 }
 
-                _ => return Err(anyhow!("Instruction {:?} not supported", instr)),
+                _ => return Err(anyhow!("Instruction {instr:?} not supported")),
             }
         }
 
