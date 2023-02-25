@@ -20,47 +20,51 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use crate::il::IlChunk;
+use crate::{ast::tree::Node, il::IlChunk};
 
-pub struct DecompilerSettings {}
+use super::OptimizationLevel;
 
 #[derive(Default)]
-pub struct DecompilerBuilder {
-    settings: Option<DecompilerSettings>,
+pub struct CompilerBuilder {
+    optimization_level: Option<OptimizationLevel>,
 }
 
-impl DecompilerBuilder {
-    fn new() -> Self {
+impl CompilerBuilder {
+    #[must_use]
+    pub fn new() -> Self {
         Self::default()
     }
 
-    fn with_settings(settings: DecompilerSettings) -> Self {
+    #[must_use]
+    pub fn with_optimization_level(level: OptimizationLevel) -> Self {
         Self {
-            settings: Some(settings),
+            optimization_level: Some(level),
         }
     }
 
-    fn settings(&mut self, settings: DecompilerSettings) -> &mut Self {
-        self.settings = Some(settings);
+    #[must_use]
+    pub fn optimization_level(mut self, level: OptimizationLevel) -> Self {
+        self.optimization_level = Some(level);
 
         self
     }
+
+    fn build(self) -> Compiler {
+        Compiler {
+            optimization_level: self.optimization_level.unwrap_or_default(),
+        }
+    }
 }
 
-pub struct Decompiler {
-    settings: DecompilerSettings,
+pub struct Compiler {
+    job_count: 0,
+    optimization_level: OptimizationLevel,
 }
 
-/// The format of bytecode specific to a certain Lua version.
-pub trait BytecodeFormat {
-    fn serialize(&self, chunk: IlChunk) -> Vec<u8>;
-    fn deserialize(&self, bytecode: impl AsRef<[u8]>) -> IlChunk;
-}
-
-impl Decompiler {
-    /// Begins a decompilation job of bytecode with a specified format.
-    pub fn decompile(bytecode: impl AsRef<[u8]>, fmt: impl BytecodeFormat) -> String {
-        let _il = fmt.deserialize(bytecode);
+impl Compiler {
+    /// Begins a compilation job of a source AST with a specified serializer
+    /// for the resulting bytecode format.
+    pub fn create_job<F: Fn(IlChunk) -> Vec<u8>>(source: &dyn Node, serializer: F) -> Vec<u8> {
         todo!()
     }
 }

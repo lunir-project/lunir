@@ -21,8 +21,7 @@
 // SOFTWARE.
 
 pub mod ast;
-pub mod compiler;
-pub mod decompiler;
 pub mod il;
 pub mod lifter;
+pub mod pipelines;
 pub mod prelude;

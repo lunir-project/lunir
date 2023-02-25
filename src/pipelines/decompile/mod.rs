@@ -19,3 +19,54 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
+use crate::il::IlChunk;
+
+use super::OptimizationLevel;
+
+#[derive(Default)]
+pub struct DecompilerBuilder {
+    optimization_level: Option<OptimizationLevel>,
+}
+
+impl DecompilerBuilder {
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    #[must_use]
+    pub fn with_optimization_level(level: OptimizationLevel) -> Self {
+        Self {
+            optimization_level: Some(level),
+        }
+    }
+
+    #[must_use]
+    pub fn optimization_level(mut self, level: OptimizationLevel) -> Self {
+        self.optimization_level = Some(level);
+
+        self
+    }
+
+    fn build(self) -> Decompiler {
+        Decompiler {
+            optimization_level: self.optimization_level.unwrap_or_default(),
+        }
+    }
+}
+
+pub struct Decompiler {
+    optimization_level: OptimizationLevel,
+}
+
+impl Decompiler {
+    /// Begins a decompilation job of bytecode with a specified deserializer for
+    /// the source bytecode format.
+    pub fn decompile<F: Fn(AsRef<[u8]>) -> Vec<u8>>(
+        bytecode: impl AsRef<[u8]>,
+        deserializer: F,
+    ) -> String {
+        todo!()
+    }
+}
