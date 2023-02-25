@@ -20,53 +20,101 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use crate::il::IlChunk;
-
 use super::OptimizationLevel;
+use crate::{ast::tree::*, il::IlChunk};
+use std::{
+    marker::PhantomData,
+    sync::{Arc, Weak},
+};
 
-#[derive(Default)]
-pub struct DecompilerBuilder {
-    optimization_level: Option<OptimizationLevel>,
+#[derive(Clone, Debug)]
+pub struct NoReconstructor;
+
+#[derive(Clone, Debug)]
+pub struct WithReconstructor<'a, V: Visitor<'a>> {
+    pub visitor: V,
+    _marker: PhantomData<&'a V>,
 }
 
-impl DecompilerBuilder {
-    #[must_use]
-    pub fn new() -> Self {
-        Self::default()
-    }
+#[derive(Clone, Debug)]
+pub struct NoChunk;
+#[derive(Clone, Debug)]
+pub struct WithChunk(IlChunk);
 
-    #[must_use]
-    pub fn with_optimization_level(level: OptimizationLevel) -> Self {
-        Self {
-            optimization_level: Some(level),
-        }
-    }
-
-    #[must_use]
-    pub fn optimization_level(mut self, level: OptimizationLevel) -> Self {
-        self.optimization_level = Some(level);
-
-        self
-    }
-
-    fn build(self) -> Decompiler {
-        Decompiler {
-            optimization_level: self.optimization_level.unwrap_or_default(),
-        }
-    }
-}
-
-pub struct Decompiler {
+/// The interface of LUNIR's decompilation pipeline. `DecompilationJob` allows you to pass in parameters to the LUNIR decompilation pipeline and invoke it, even across threads.
+#[derive(Clone, Debug)]
+pub struct DecompilationJob<C, F> {
+    chunk: C,
     optimization_level: OptimizationLevel,
+    _reference: Weak<()>,
+    reconstructor: F,
+}
+
+impl<'a, C> DecompilationJob<C, NoReconstructor> {
+    /// Adds a target format source reconstruction visitor to this `CompilationJob` to allow it to produce a final bytecode.
+    pub fn reconstructor<V: Visitor<'a>>(
+        self,
+        visitor: V,
+    ) -> DecompilationJob<C, WithReconstructor<'a, V>> {
+        DecompilationJob {
+            chunk: self.chunk,
+            optimization_level: self.optimization_level,
+            _reference: self._reference,
+            reconstructor: WithReconstructor {
+                visitor,
+                _marker: PhantomData,
+            },
+        }
+    }
+}
+
+impl<'a, F> DecompilationJob<NoChunk, F> {
+    /// Adds a source LUNIR intermediate language chunk to this `DecompilationJob`.
+    pub fn chunk(self, chunk: IlChunk) -> DecompilationJob<WithChunk, F> {
+        DecompilationJob {
+            chunk: WithChunk(chunk),
+            optimization_level: self.optimization_level,
+            _reference: self._reference,
+            reconstructor: self.reconstructor,
+        }
+    }
+}
+
+impl<'a, V: Visitor<'a>> DecompilationJob<WithChunk, WithReconstructor<'a, V>> {
+    /// Invokes LUNIR's decompilation pipeline with the parameters passed through the this `DecompilationJob`. This will consume the job.
+    #[must_use = "The result of decompilation should be used."]
+    pub fn run(self) -> String {
+        todo!()
+    }
+}
+
+/// A factory for `CompilationJob`s.
+pub struct Decompiler {
+    handle: Arc<()>,
 }
 
 impl Decompiler {
-    /// Begins a decompilation job of bytecode with a specified deserializer for
-    /// the source bytecode format.
-    pub fn decompile<F: Fn(AsRef<[u8]>) -> Vec<u8>>(
-        bytecode: impl AsRef<[u8]>,
-        deserializer: F,
-    ) -> String {
-        todo!()
+    /// Creates a new `Decompiler`.
+    pub fn new() -> Self {
+        Self {
+            handle: Arc::new(()),
+        }
+    }
+}
+
+impl Decompiler {
+    /// Constructs a `DecompilationJob`.
+    pub fn create_job(&self) -> DecompilationJob<NoChunk, NoReconstructor> {
+        DecompilationJob {
+            chunk: NoChunk,
+            _reference: Arc::downgrade(&self.handle),
+            optimization_level: OptimizationLevel::default(),
+            reconstructor: NoReconstructor,
+        }
+    }
+
+    /// Returns the number of currently living `CompilationJob`s created by this compiler or by cloning `CompilationJob`s created by this compiler.
+    pub fn job_count(&self) -> usize {
+        Arc::weak_count(&self.handle)
     }
 }

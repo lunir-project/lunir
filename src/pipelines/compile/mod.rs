@@ -20,51 +20,91 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use crate::{ast::tree::Node, il::IlChunk};
-
 use super::OptimizationLevel;
+use crate::{ast::tree::*, il::IlChunk};
+use std::sync::{Arc, Weak};
 
-#[derive(Default)]
-pub struct CompilerBuilder {
-    optimization_level: Option<OptimizationLevel>,
-}
+#[derive(Clone, Debug)]
+pub struct NoSerializer;
+#[derive(Clone, Debug)]
+pub struct WithSerializer<S: Fn(IlChunk) -> Vec<u8>>(S);
 
-impl CompilerBuilder {
-    #[must_use]
-    pub fn new() -> Self {
-        Self::default()
-    }
+#[derive(Clone, Debug)]
+pub struct NoTree;
+#[derive(Clone, Debug)]
+pub struct WithTree<'n>(&'n Node);
 
-    #[must_use]
-    pub fn with_optimization_level(level: OptimizationLevel) -> Self {
-        Self {
-            optimization_level: Some(level),
-        }
-    }
-
-    #[must_use]
-    pub fn optimization_level(mut self, level: OptimizationLevel) -> Self {
-        self.optimization_level = Some(level);
-
-        self
-    }
-
-    fn build(self) -> Compiler {
-        Compiler {
-            optimization_level: self.optimization_level.unwrap_or_default(),
-        }
-    }
-}
-
-pub struct Compiler {
-    job_count: 0,
+/// The interface of LUNIR's compilation pipeline. `CompilationJob` allows you to pass in parameters to the LUNIR compilation pipeline and invoke it, even across threads.
+#[derive(Clone, Debug)]
+pub struct CompilationJob<T, F> {
     optimization_level: OptimizationLevel,
+    _reference: Weak<()>,
+    serializer: F,
+    tree: T,
+}
+
+impl<'a, T> CompilationJob<T, NoSerializer> {
+    /// Adds a target format serializer function to this `CompilationJob` toa llow it to produce a final bytecode.
+    pub fn serializer<S: Fn(IlChunk) -> Vec<u8>>(
+        self,
+        serializer: S,
+    ) -> CompilationJob<T, WithSerializer<S>> {
+        CompilationJob {
+            optimization_level: self.optimization_level,
+            _reference: self._reference,
+            serializer: WithSerializer(serializer),
+            tree: self.tree,
+        }
+    }
+}
+
+impl<'a, F> CompilationJob<NoTree, F> {
+    /// Adds a source abstract syntax tree to this `CompilationJob`.
+    pub fn tree(self, tree: &'a Node) -> CompilationJob<WithTree<'a>, F> {
+        CompilationJob {
+            optimization_level: self.optimization_level,
+            _reference: self._reference,
+            serializer: self.serializer,
+            tree: WithTree(tree),
+        }
+    }
+}
+
+impl<'a, S: Fn(IlChunk) -> Vec<u8>> CompilationJob<WithTree<'a>, WithSerializer<S>> {
+    /// Invokes LUNIR's compilation pipeline with the parameters passed through the this `CompilationJob`. This will consume the job.
+    #[must_use = "The result of compilation should be used."]
+    pub fn run(self) -> Vec<u8> {
+        todo!()
+    }
+}
+
+/// A factory for `CompilationJob`s.
+pub struct Compiler {
+    handle: Arc<()>,
 }
 
 impl Compiler {
-    /// Begins a compilation job of a source AST with a specified serializer
-    /// for the resulting bytecode format.
-    pub fn create_job<F: Fn(IlChunk) -> Vec<u8>>(source: &dyn Node, serializer: F) -> Vec<u8> {
-        todo!()
+    /// Creates a new `Compiler`.
+    pub fn new() -> Self {
+        Self {
+            handle: Arc::new(()),
+        }
+    }
+}
+
+impl Compiler {
+    /// Constructs a `CompilationJob`.
+    pub fn create_job(&self) -> CompilationJob<NoTree, NoSerializer> {
+        CompilationJob {
+            _reference: Arc::downgrade(&self.handle),
+            optimization_level: OptimizationLevel::default(),
+            serializer: NoSerializer,
+            tree: NoTree,
+        }
+    }
+
+    /// Returns the number of currently living `CompilationJob`s created by this compiler or by cloning `CompilationJob`s created by this compiler.
+    pub fn job_count(&self) -> usize {
+        Arc::weak_count(&self.handle)
     }
 }
