@@ -1,4 +1,3 @@
-
 // MIT License
 
 // Copyright (c) 2023 lunir-project
@@ -21,16 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+// TODO: Remove
+#![allow(unused)]
+
 use crate::{
-    ast::{
-        expression::*,
-        statement::{self, *},
-    },
-    il::{Constant, Function, Instruction, Return, Table, Value},
+    ast::{expression::*, statement::*},
+    il::{Constant, Function, Instruction, Table, Value},
 };
 
 use anyhow::{anyhow, Result};
-use std::{collections::BTreeMap, rc::Rc};
+use std::rc::Rc;
 
 #[derive(Default)]
 struct ExpressionStack(Vec<Expression>);
@@ -71,7 +70,7 @@ impl ExpressionStack {
     }
 }
 
-pub struct Lifter {
+pub(crate) struct Lifter {
     expression_stack: ExpressionStack,
     instructions: Vec<Instruction>,
     function: Function,
