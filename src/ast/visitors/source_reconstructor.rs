@@ -1,4 +1,3 @@
-
 // MIT License
 
 // Copyright (c) 2023 lunir-project
@@ -21,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use crate::ast::{expression::*, tree::*};
+use crate::ast::{expression::*, statement::*, tree::*};
 
 #[derive(Default)]
 pub struct SourceReconstructor {
@@ -41,61 +40,95 @@ impl SourceReconstructor {
     }
 }
 
-impl VisitorMut<GlobalSymbol> for SourceReconstructor {
-    fn visit_mut(&mut self, node: &GlobalSymbol) {
-        self.source.push_str(&node.0);
+impl Visitor<'_> for SourceReconstructor {
+    fn visit_bool(&mut self, node: &'_ Boolean) {
+        self.source.push_str(if node.0 { "true" } else { "false" });
     }
-}
 
-impl VisitorMut<Identifier> for SourceReconstructor {
-    fn visit_mut(&mut self, node: &Identifier) {
-        self.source.push_str(&node.0);
+    fn visit_string(&mut self, node: &'_ Str) {
+        self.source
+            .push_str(format!(r#""{}""#, node.0.sanitize_special()).as_str());
     }
-}
 
-impl VisitorMut<Str> for SourceReconstructor {
-    fn visit_mut(&mut self, node: &Str) {
-        self.source.push_str(format!(r#""{}""#, node.0).as_str());
+    fn visit_number(&mut self, node: &'_ Number) {
+        self.source.push_str(node.0.to_string().as_str());
     }
-}
 
-impl VisitorMut<CallExpression> for SourceReconstructor {
-    fn visit_mut(&mut self, node: &CallExpression) {
-        node.function.accept_mut(self);
+    fn visit_nil(&mut self, _: &'_ Nil) {
+        self.source.push_str("nil");
+    }
+
+    fn visit_identifier(&mut self, node: &'_ Identifier) {
+        self.source.push_str(node.0.as_str());
+    }
+
+    fn visit_global_symbol(&mut self, node: &'_ GlobalSymbol) {
+        self.source.push_str(node.0.as_str());
+    }
+
+    fn visit_return(&mut self, node: &'_ StatReturn) {
+        self.source.push_str("return ");
+
+        let last = node.results.len() - 1;
+        for (i, value) in node.results.iter().enumerate() {
+            self.visit_expr(value);
+
+            if i < last {
+                self.source.push_str(", ");
+            }
+        }
+    }
+
+    fn visit_call(&mut self, node: &'_ CallExpression) {
+        self.visit_expr(&node.function);
 
         self.source.push('(');
 
-        let last = node.arguments.len();
-        for (i, arg) in node.arguments.iter().enumerate() {
-            arg.accept_mut(self);
+        let last = node.arguments.len() - 1;
+        for (i, value) in node.arguments.iter().enumerate() {
+            self.visit_expr(value);
 
-            if i < last - 1 {
-                self.source.push(',');
+            if i < last {
+                self.source.push_str(", ");
             }
         }
 
         self.source.push(')');
     }
-}
 
-impl VisitorMut<Expression> for SourceReconstructor {
-    fn visit_mut(&mut self, node: &Expression) {
-        macro_rules! visit {
-            ($node: expr, $($t: ident,)* ) => {
-                match $node {
-                    $(
-                        Expression::$t(x) => x.accept_mut(self),
-                    )*
+    fn visit_unary(&mut self, node: &'_ UnaryExpression) {
+        self.source.push_str(node.kind.to_string().as_str());
+        self.visit_expr(&node.value);
+    }
 
-                    _ => unimplemented!(),
+    fn visit_binary(&mut self, node: &'_ BinaryExpression) {
+        self.visit_expr(&node.left);
+
+        self.source.push_str(format!(" {} ", node.kind).as_str());
+
+        self.visit_expr(&node.right);
+    }
+
+    fn visit_index_op(&mut self, node: &'_ IndexOp) {
+        self.visit_expr(&node.table);
+
+        match &node.key {
+            Expression::String(s) => {
+                if s.0.can_identify() {
+                    self.source.push('.');
+                    self.source.push_str(s.0.as_str());
+                } else {
+                    self.source.push_str(r#"[""#);
+                    self.source.push_str(s.0.sanitize_special().as_str());
+                    self.source.push_str(r#""]"#);
                 }
-            };
+            }
 
-            ($node: expr, $($t: ident),*) => {
-                visit!($node, $($t,)*)
-            };
+            _ => {
+                self.source.push('[');
+                self.visit_expr(&node.key);
+                self.source.push(']');
+            }
         }
-
-        visit!(node, String, Call, GlobalSymbol, Identifier);
     }
 }
