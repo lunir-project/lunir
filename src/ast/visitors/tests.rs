@@ -22,25 +22,38 @@
 
 #![cfg(test)]
 
-use crate::ast::{expression::*, tree::*, visitors::*};
-use std::rc::Rc;
+use crate::{
+    ast::{expression::*, tree::*, visitors::*},
+    prelude::visitors::source_reconstructor::{
+        SourceReconstructor, SourceReconstructorSettingsBuilder,
+    },
+};
+use std::{rc::Rc, time::Duration};
 
 #[test]
 fn ast_to_lua() {
+    const EXPECTED: &'static str = r#"print("it worked!");"#;
+    let settings = SourceReconstructorSettingsBuilder::default()
+        .custom_header(None)
+        .use_semicolons(true)
+        .build()
+        .expect("couldn't initialize settings");
+
     let expression = CallExpression {
         is_self: false,
         function: Expression::GlobalSymbol(Rc::new(GlobalSymbol("print".to_string()))),
         arguments: vec![Expression::String(Rc::new(Str("it worked!".to_string())))],
     };
 
-    let mut reconstructor = source_reconstructor::SourceReconstructor::default();
+    let mut reconstructor = SourceReconstructor::with_settings(settings.clone());
     reconstructor.visit_call(&expression);
 
-    assert_eq!(dbg!(reconstructor.source()), r#"print("it worked!")"#);
+    assert_eq!(dbg!(reconstructor.source()), EXPECTED);
 
-    let mut reconstructor = source_reconstructor::SourceReconstructor::default();
+    let mut reconstructor = SourceReconstructor::with_settings(settings);
     let wrapped_expression = Expression::Call(Rc::new(expression));
 
     reconstructor.visit_expr(&wrapped_expression);
-    assert_eq!(dbg!(reconstructor.source()), r#"print("it worked!")"#);
+
+    assert_eq!(dbg!(reconstructor.source()), EXPECTED);
 }
