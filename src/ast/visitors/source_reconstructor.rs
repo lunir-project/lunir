@@ -30,7 +30,8 @@ pub struct SourceReconstructor {
     settings: SourceReconstructorSettings,
 }
 
-#[derive(Builder)]
+#[derive(Debug, Builder, Clone)]
+#[builder(default)]
 pub struct SourceReconstructorSettings {
     /// Appends semicolons to the end of statements. Redundant if use_newline is false
     use_semicolons: bool,
