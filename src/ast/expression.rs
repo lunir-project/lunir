@@ -193,6 +193,12 @@ pub enum TableExpression {
 }
 
 #[derive(Debug, Clone, PartialEq)]
+pub struct ShadowExpression {
+    pub is_shadowed: bool,
+    pub value: Expression,
+}
+
+#[derive(Debug, Clone, PartialEq)]
 pub struct IndexOp {
     pub key: Expression,
     pub table: Expression,
@@ -229,4 +235,5 @@ pub enum Expression {
     GlobalSymbol(Rc<GlobalSymbol>),
     Identifier(Rc<Identifier>),
     Table(Rc<TableExpression>),
+    Shadow(Rc<ShadowExpression>),
 }

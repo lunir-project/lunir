@@ -62,6 +62,12 @@ pub trait Visitor<'a>: Sized {
         walk_unary(self, node)
     }
 
+    fn visit_shadowed(&mut self, node: &'a ShadowExpression) {
+        if !node.is_shadowed {
+            self.visit_expr(&node.value);
+        }
+    }
+
     fn visit_index_op(&mut self, node: &'a IndexOp) {
         walk_index_op(self, node)
     }
@@ -108,6 +114,13 @@ pub fn walk_expression<'a, V: Visitor<'a>>(visitor: &mut V, node: &'a Expression
         Expression::String(s) => visitor.visit_string(s),
         Expression::Table(table) => visitor.visit_table(table),
         Expression::UnaryOp(unary) => visitor.visit_unary(unary),
+        Expression::Shadow(shadow) => visitor.visit_shadowed(shadow),
+    }
+}
+
+pub fn walk_shadowed<'a, V: Visitor<'a>>(visitor: &mut V, node: &'a ShadowExpression) {
+    if !node.is_shadowed {
+        walk_expression(visitor, &node.value);
     }
 }
 
