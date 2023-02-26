@@ -23,12 +23,12 @@
 #![cfg(test)]
 
 use crate::{
-    ast::{expression::*, tree::*, visitors::*},
+    ast::{expression::*, tree::*},
     prelude::visitors::source_reconstructor::{
         SourceReconstructor, SourceReconstructorSettingsBuilder,
     },
 };
-use std::{rc::Rc, time::Duration};
+use std::rc::Rc;
 
 #[test]
 fn ast_to_lua() {
