@@ -35,6 +35,9 @@ pub struct SourceReconstructorSettings {
     /// Appends semicolons to the end of statements
     use_semicolons: bool,
 
+    /// Appends a newline character (\n) to the end of statements. If false, all of the code will be on the same line.
+    use_newline: bool,
+
     /// Uses tabs instead of spaces for indentation
     use_tabs: bool,
 
@@ -50,6 +53,7 @@ impl Default for SourceReconstructorSettings {
         Self {
             space_count: 4,
             use_semicolons: true,
+            use_newline: true,
             use_tabs: false,
             custom_header: Some(
                 "Decompiled with LUNIR (https://github.com/lunir-project/lunir)".to_string(),
@@ -147,7 +151,9 @@ impl Visitor<'_> for SourceReconstructor {
             self.source.push(';');
         }
 
-        self.source.push('\n');
+        if self.settings.use_newline {
+            self.source.push('\n');
+        }
     }
 
     fn visit_binary(&mut self, node: &'_ BinaryExpression) {
