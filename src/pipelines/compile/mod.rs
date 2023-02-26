@@ -83,7 +83,7 @@ impl<'a, F> CompilationJob<NoTree, F> {
 }
 
 impl<'a, S: Fn(IlChunk) -> Vec<u8>> CompilationJob<WithTree<'a>, WithSerializer<S>> {
-    /// Invokes LUNIR's compilation pipeline with the parameters passed through the this `CompilationJob`. This will consume the job.
+    /// Invokes LUNIR's compilation pipeline with the parameters passed through the `CompilationJob`. This will consume the job.
     #[must_use = "The result of compilation should be used."]
     pub fn run(self) -> Vec<u8> {
         todo!()

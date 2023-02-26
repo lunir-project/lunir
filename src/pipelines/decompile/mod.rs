@@ -30,15 +30,18 @@ use std::{
 #[doc(hidden)]
 #[derive(Clone, Debug)]
 pub struct NoReconstructor;
+
 #[doc(hidden)]
 #[derive(Clone, Debug)]
 pub struct WithReconstructor<'a, V: Visitor<'a>> {
     pub visitor: V,
     _marker: PhantomData<&'a V>,
 }
+
 #[doc(hidden)]
 #[derive(Clone, Debug)]
 pub struct NoChunk;
+
 #[doc(hidden)]
 #[derive(Clone, Debug)]
 pub struct WithChunk(IlChunk);
