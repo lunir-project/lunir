@@ -81,6 +81,13 @@ impl SourceReconstructor {
             None => self.source,
         }
     }
+
+    pub fn with_settings(settings: SourceReconstructorSettings) -> Self {
+        Self {
+            settings,
+            ..Default::default()
+        }
+    }
 }
 
 impl Visitor<'_> for SourceReconstructor {
