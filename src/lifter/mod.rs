@@ -26,6 +26,7 @@
 use crate::{
     ast::{expression::*, statement::*},
     il::{Constant, Function, Instruction, Table, Value},
+    prelude::OptVariable,
 };
 
 use anyhow::{anyhow, Result};
@@ -67,6 +68,24 @@ impl ExpressionStack {
         self.0.get(idx).ok_or(anyhow!(
             "No local reference at index {idx} on expression stack"
         ))
+    }
+
+    fn shadow(&self, idx: usize) -> Result<Expression> {
+        self.verify_stack_index(idx)?;
+
+        let expression = self.0.get(idx).unwrap();
+
+        Ok(Expression::Shadow(Rc::new(
+            ShadowExpression::new(expression.clone()).shadow(true),
+        )))
+    }
+
+    fn verify_stack_index(&self, index: usize) -> Result<()> {
+        if index >= self.0.len() {
+            return Err(anyhow!("Expression stack index {index} out of range"));
+        }
+
+        Ok(())
     }
 }
 
@@ -133,41 +152,73 @@ impl Lifter {
         }
     }
 
-    fn verify_stack_index(&self, index: usize) -> Result<()> {
-        if index >= self.expression_stack.0.len() {
-            return Err(anyhow!("Expression stack index {index} out of range"));
-        }
-
-        Ok(())
-    }
-
     pub fn lift(&mut self) -> Result<Box<StatBlock>> {
         let mut result = Box::<StatBlock>::default();
 
         for instr in self.instructions.clone().iter() {
             match instr.clone() {
                 Instruction::Load(inst) => {
-                    self.verify_stack_index(inst.dest)?;
+                    self.expression_stack.verify_stack_index(inst.dest)?;
 
                     *self.expression_stack.get_local_mut(inst.dest)? =
                         self.value_to_ast(&inst.src)?;
                 }
 
                 Instruction::GetGlobal(inst) => {
-                    self.verify_stack_index(inst.dest)?;
+                    self.expression_stack.verify_stack_index(inst.dest)?;
 
                     *self.expression_stack.get_local_mut(inst.dest)? =
                         self.constant_index_to_ast(inst.constant)?;
                 }
 
+                Instruction::Call(inst) => {
+                    let function = self.expression_stack.get_local(inst.callee)?;
+                    let nargs = if let OptVariable::Number(n) = inst.num_args {
+                        n
+                    } else {
+                        self.function.max_stack_size as usize - inst.callee
+                    };
+
+                    let mut arguments = Vec::<Expression>::with_capacity(nargs);
+                    for i in (inst.callee + 1 + inst.self_call as usize..inst.callee + nargs) {
+                        arguments.push(self.expression_stack.get_local(i)?.clone());
+                    }
+
+                    for i in (inst.callee + inst.self_call as usize
+                        ..self.function.max_stack_size as usize)
+                    {
+                        self.expression_stack.shadow(i)?;
+                    }
+
+                    let call_expression = Rc::new(CallExpression {
+                        arguments,
+                        function: function.clone(),
+                        is_self: inst.self_call,
+                    });
+
+                    if let OptVariable::Variable = inst.num_returns {
+                        result
+                            .body
+                            .push(Expression::Call(call_expression).to_statement());
+                    } else {
+                        *self.expression_stack.get_local_mut(inst.callee)? =
+                            Expression::Call(call_expression);
+                    }
+                }
+
                 Instruction::Return(inst) => {
-                    self.verify_stack_index(inst.result_start + inst.result_count)?;
+                    self.expression_stack
+                        .verify_stack_index(inst.result_start + inst.result_count)?;
                     let mut return_stat = Box::<StatReturn>::default();
 
                     for stack_index in inst.result_start..(inst.result_start + inst.result_count) {
                         return_stat
                             .results
                             .push(self.expression_stack.get_local(stack_index)?.clone());
+                    }
+
+                    for idx in inst.result_start + 1..self.function.max_stack_size as usize {
+                        self.expression_stack.shadow(idx)?;
                     }
 
                     result.body.push(Statement::StatReturn(return_stat));
