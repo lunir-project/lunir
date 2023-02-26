@@ -184,6 +184,7 @@ pub enum OptVariable {
 pub struct Call {
     pub callee: usize,
 
+    pub self_call: bool,
     pub num_args: OptVariable,
     pub num_returns: OptVariable,
 }
