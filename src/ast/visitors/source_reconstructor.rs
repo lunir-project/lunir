@@ -32,7 +32,7 @@ pub struct SourceReconstructor {
 
 #[derive(Builder)]
 pub struct SourceReconstructorSettings {
-    /// Appends semicolons to the end of statements
+    /// Appends semicolons to the end of statements. Redundant if use_newline is false
     use_semicolons: bool,
 
     /// Appends a newline character (\n) to the end of statements. If false, all of the code will be on the same line.
@@ -147,12 +147,13 @@ impl Visitor<'_> for SourceReconstructor {
     fn visit_stat(&mut self, node: &'_ Statement) {
         walk_statement(self, node);
 
-        if self.settings.use_semicolons {
-            self.source.push(';');
-        }
-
         if self.settings.use_newline {
+            if self.settings.use_semicolons {
+                self.source.push(';');
+            }
             self.source.push('\n');
+        } else {
+            self.source.push(';');
         }
     }
 
