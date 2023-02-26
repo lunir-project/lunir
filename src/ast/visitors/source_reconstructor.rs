@@ -21,28 +21,67 @@
 // SOFTWARE.
 
 use crate::ast::{expression::*, statement::*, tree::*};
+use derive_builder::Builder;
 
 #[derive(Default)]
 pub struct SourceReconstructor {
     indents: usize,
     source: String,
+    settings: SourceReconstructorSettings,
+}
+
+#[derive(Builder)]
+pub struct SourceReconstructorSettings {
+    /// Appends semicolons to the end of statements
+    use_semicolons: bool,
+
+    /// Uses tabs instead of spaces for indentation
+    use_tabs: bool,
+
+    /// This field is invalidated if the `use_tabs` field is set
+    space_count: usize,
+
+    /// This string will be added to the top of the file. If this field is `None`, then nothing will
+    custom_header: Option<String>,
+}
+
+impl Default for SourceReconstructorSettings {
+    fn default() -> Self {
+        Self {
+            space_count: 4,
+            use_semicolons: true,
+            use_tabs: false,
+            custom_header: Some(
+                "Decompiled with LUNIR (https://github.com/lunir-project/lunir)".to_string(),
+            ),
+        }
+    }
 }
 
 impl SourceReconstructor {
     fn indent(&mut self) {
         assert!(self.indents > 0);
-        self.source
-            .push_str(&format!("{:1$}", "", self.indents - 1));
+        self.source.push_str(
+            if self.settings.use_tabs {
+                "\t".repeat(self.indents)
+            } else {
+                " ".repeat(4 * self.settings.space_count)
+            }
+            .as_str(),
+        );
     }
 
-    pub fn source(&self) -> &String {
-        &self.source
+    pub fn source(self) -> String {
+        match self.settings.custom_header {
+            Some(header) => format!("// {}\n{}", header, self.source),
+            None => self.source,
+        }
     }
 }
 
 impl Visitor<'_> for SourceReconstructor {
     fn visit_bool(&mut self, node: &'_ Boolean) {
-        self.source.push_str(if node.0 { "true" } else { "false" });
+        self.source.push_str(format!("{}", node.0).as_str());
     }
 
     fn visit_string(&mut self, node: &'_ Str) {
@@ -99,6 +138,16 @@ impl Visitor<'_> for SourceReconstructor {
     fn visit_unary(&mut self, node: &'_ UnaryExpression) {
         self.source.push_str(node.kind.to_string().as_str());
         self.visit_expr(&node.value);
+    }
+
+    fn visit_stat(&mut self, node: &'_ Statement) {
+        walk_statement(self, node);
+
+        if self.settings.use_semicolons {
+            self.source.push(';');
+        }
+
+        self.source.push('\n');
     }
 
     fn visit_binary(&mut self, node: &'_ BinaryExpression) {
