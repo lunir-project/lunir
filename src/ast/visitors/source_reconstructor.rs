@@ -56,9 +56,10 @@ impl Default for SourceReconstructorSettings {
             use_semicolons: true,
             use_newline: true,
             use_tabs: false,
-            custom_header: Some(
-                "Decompiled with LUNIR (https://github.com/lunir-project/lunir)".to_string(),
-            ),
+            custom_header: Some(format!(
+                "Decompiled with LUNIR, version {} (https://github.com/lunir-project/lunir)",
+                env!("CARGO_PKG_VERSION")
+            )),
         }
     }
 }
