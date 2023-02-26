@@ -22,19 +22,13 @@
 
 use super::{expression::*, statement::*};
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub enum NodeKind {
     Expression(Expression),
     Statement(Statement),
 
+    #[default]
     None,
-}
-
-impl Default for NodeKind {
-    #[inline]
-    fn default() -> Self {
-        NodeKind::None
-    }
 }
 
 pub trait Visitor<'a>: Sized {
