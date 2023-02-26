@@ -56,7 +56,7 @@ impl<T, F> CompilationJob<T, F> {
     }
 }
 impl<'a, T> CompilationJob<T, NoSerializer> {
-    /// Adds a target format serializer function to this `CompilationJob` toa llow it to produce a final bytecode.
+    /// Adds a target format serializer function to this `CompilationJob` to allow it to produce a final bytecode.
     pub fn serializer<S: Fn(IlChunk) -> Vec<u8>>(
         self,
         serializer: S,
