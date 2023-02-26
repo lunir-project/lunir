@@ -24,13 +24,17 @@ use super::OptimizationLevel;
 use crate::{ast::tree::*, il::IlChunk};
 use std::sync::{Arc, Weak};
 
+#[doc(hidden)]
 #[derive(Clone, Debug)]
 pub struct NoSerializer;
+#[doc(hidden)]
 #[derive(Clone, Debug)]
 pub struct WithSerializer<S: Fn(IlChunk) -> Vec<u8>>(S);
 
+#[doc(hidden)]
 #[derive(Clone, Debug)]
 pub struct NoTree;
+#[doc(hidden)]
 #[derive(Clone, Debug)]
 pub struct WithTree<'n>(&'n Node);
 
@@ -43,6 +47,14 @@ pub struct CompilationJob<T, F> {
     tree: T,
 }
 
+impl<T, F> CompilationJob<T, F> {
+    /// Sets the optimization level of this `CompilationJob`.
+    fn optimization_level(mut self, level: OptimizationLevel) -> Self {
+        self.optimization_level = level;
+
+        self
+    }
+}
 impl<'a, T> CompilationJob<T, NoSerializer> {
     /// Adds a target format serializer function to this `CompilationJob` toa llow it to produce a final bytecode.
     pub fn serializer<S: Fn(IlChunk) -> Vec<u8>>(

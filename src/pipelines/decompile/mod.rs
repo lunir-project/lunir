@@ -27,17 +27,19 @@ use std::{
     sync::{Arc, Weak},
 };
 
+#[doc(hidden)]
 #[derive(Clone, Debug)]
 pub struct NoReconstructor;
-
+#[doc(hidden)]
 #[derive(Clone, Debug)]
 pub struct WithReconstructor<'a, V: Visitor<'a>> {
     pub visitor: V,
     _marker: PhantomData<&'a V>,
 }
-
+#[doc(hidden)]
 #[derive(Clone, Debug)]
 pub struct NoChunk;
+#[doc(hidden)]
 #[derive(Clone, Debug)]
 pub struct WithChunk(IlChunk);
 
@@ -50,8 +52,17 @@ pub struct DecompilationJob<C, F> {
     reconstructor: F,
 }
 
+impl<C, F> DecompilationJob<C, F> {
+    /// Sets the optimization level of this `DecompilationJob`.
+    pub fn optimization_level(mut self, level: OptimizationLevel) -> Self {
+        self.optimization_level = level;
+
+        self
+    }
+}
+
 impl<'a, C> DecompilationJob<C, NoReconstructor> {
-    /// Adds a target format source reconstruction visitor to this `CompilationJob` to allow it to produce a final bytecode.
+    /// Adds a target format source reconstruction visitor to this `DecompilationJob` to allow it to produce a final source string.
     pub fn reconstructor<V: Visitor<'a>>(
         self,
         visitor: V,
@@ -88,7 +99,7 @@ impl<'a, V: Visitor<'a>> DecompilationJob<WithChunk, WithReconstructor<'a, V>> {
     }
 }
 
-/// A factory for `CompilationJob`s.
+/// A factory for `DecompilationJob`s.
 pub struct Decompiler {
     handle: Arc<()>,
 }
@@ -113,7 +124,7 @@ impl Decompiler {
         }
     }
 
-    /// Returns the number of currently living `CompilationJob`s created by this compiler or by cloning `CompilationJob`s created by this compiler.
+    /// Returns the number of currently living `DecompilationJob`s created by this `Decompiler` or by cloning `DecompilationJob`s created by this `Decompiler`.
     pub fn job_count(&self) -> usize {
         Arc::weak_count(&self.handle)
     }
