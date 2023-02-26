@@ -198,6 +198,21 @@ pub struct ShadowExpression {
     pub value: Expression,
 }
 
+impl ShadowExpression {
+    pub fn new(value: Expression) -> Self {
+        Self {
+            value,
+            is_shadowed: false,
+        }
+    }
+
+    pub fn shadow(mut self, value: bool) -> Self {
+        self.is_shadowed = value;
+
+        self
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct IndexOp {
     pub key: Expression,
@@ -236,4 +251,16 @@ pub enum Expression {
     Identifier(Rc<Identifier>),
     Table(Rc<TableExpression>),
     Shadow(Rc<ShadowExpression>),
+}
+
+impl Expression {
+    pub fn to_statement(self) -> Statement {
+        Statement::StatExpr(Box::new(StatExpr { value: self }))
+    }
+}
+
+impl Into<Statement> for Expression {
+    fn into(self) -> Statement {
+        self.to_statement()
+    }
 }
