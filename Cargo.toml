@@ -1,7 +1,9 @@
 [package]
 name = "lunir"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
+rust-version = "1.62.1"
+
 
 description = "A universal intermediate representation oriented towards Lua."
 homepage = "https://github.com/lunir-project/lunir"
@@ -9,13 +11,13 @@ repository = "https://github.com/lunir-project/lunir"
 readme = "README.md"
 license = "MIT"
 
-rust-version = "1.58.1"
 
 [package.metadata.msrv]
-msrv = "1.58.1"
+msrv = "1.62.1"
 
 [dependencies]
 anyhow = "1.0.69"
+derive_builder = "0.12.0"
 itertools = "0.10.5"
 
 [profile.dev]

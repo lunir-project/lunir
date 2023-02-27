@@ -20,5 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-pub use crate::compiler::*;
-pub use crate::decompiler::*;
+pub use crate::ast::*;
+pub use crate::il::*;
+pub use crate::pipelines::{compile::*, decompile::*};

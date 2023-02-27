@@ -117,10 +117,10 @@ pub enum BinaryExpressionKind {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct BinaryExpression {
-    kind: BinaryExpressionKind,
+    pub kind: BinaryExpressionKind,
 
-    left: Expression,
-    right: Expression,
+    pub left: Expression,
+    pub right: Expression,
 }
 
 impl BinaryExpressionKind {
@@ -166,8 +166,8 @@ impl std::fmt::Display for BinaryExpressionKind {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct UnaryExpression {
-    kind: UnaryOpKind,
-    value: Expression,
+    pub kind: UnaryOpKind,
+    pub value: Expression,
 }
 
 impl std::fmt::Display for UnaryOpKind {
@@ -193,26 +193,47 @@ pub enum TableExpression {
 }
 
 #[derive(Debug, Clone, PartialEq)]
+pub struct ShadowExpression {
+    pub is_shadowed: bool,
+    pub value: Expression,
+}
+
+impl ShadowExpression {
+    pub fn new(value: Expression) -> Self {
+        Self {
+            value,
+            is_shadowed: false,
+        }
+    }
+
+    pub fn shadow(mut self, value: bool) -> Self {
+        self.is_shadowed = value;
+
+        self
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
 pub struct IndexOp {
-    key: Expression,
-    table: Expression,
+    pub key: Expression,
+    pub table: Expression,
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct CallExpression {
     pub arguments: Vec<Expression>,
     pub function: Expression,
-    
+
     pub is_self: bool,
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct FunctionExpression {
-    body: Box<StatBlock>,
-    has_vararg: bool,
+    pub body: Box<StatBlock>,
+    pub has_vararg: bool,
 
-    parameters: Vec<Expression>,
-    self_arg: Option<Expression>,
+    pub parameters: Vec<Expression>,
+    pub self_arg: Option<Expression>,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -222,11 +243,24 @@ pub enum Expression {
     UnaryOp(Rc<UnaryExpression>),
     String(Rc<Str>),
     Number(Rc<Number>),
-    Nil(Rc<Nil>), 
+    Nil(Rc<Nil>),
     IndexOp(Rc<IndexOp>),
     Call(Rc<CallExpression>),
     Function(Rc<FunctionExpression>),
     GlobalSymbol(Rc<GlobalSymbol>),
     Identifier(Rc<Identifier>),
     Table(Rc<TableExpression>),
+    Shadow(Rc<ShadowExpression>),
+}
+
+impl Expression {
+    pub fn to_statement(self) -> Statement {
+        Statement::StatExpr(Box::new(StatExpr { value: self }))
+    }
+}
+
+impl Into<Statement> for Expression {
+    fn into(self) -> Statement {
+        self.to_statement()
+    }
 }
