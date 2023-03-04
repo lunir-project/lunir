@@ -135,24 +135,16 @@ pub struct Condition {
     pub right: Value,
 }
 
-/// List of all of the compiler built-ins
+/// List of all of the compiler intrinsics
 #[derive(Debug, Clone)]
 pub enum IntrinsicKind {
-    BitAnd,
-    BitNot,
-    BitOr,
-    BitTest,
-    BitXor,
+    BitAnd(usize, Value, Value),
+    BitOr(usize, Value, Value),
+    BitXor(usize, Value, Value),
+    BitNot(usize, Value),
 
-    LeftShift,
-    LeftRotate,
-
-    RightShift,
-    RightRotate,
-
-    ArithShift,
-
-    Extract,
+    LeftShift(usize, Value, Value),
+    RightShift(usize, Value, Value),
 }
 
 // Instruction to declare intrinsic.
