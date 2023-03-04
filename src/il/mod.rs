@@ -135,6 +135,32 @@ pub struct Condition {
     pub right: Value,
 }
 
+/// List of all of the compiler built-ins
+#[derive(Debug, Clone)]
+pub enum IntrinsicKind {
+    BitAnd,
+    BitNot,
+    BitOr,
+    BitTest,
+    BitXor,
+
+    LeftShift,
+    LeftRotate,
+
+    RightShift,
+    RightRotate,
+
+    ArithShift,
+
+    Extract,
+}
+
+// Instruction to declare intrinsic.
+#[derive(Debug, Clone)]
+pub struct Intrinsic {
+    pub kind: IntrinsicKind,
+}
+
 /// Information about a program-counter-relative-jump, `start` is the program counter, `end` is the offset added to the base index, and `offset` is the total number of instructions skipped for the branch.
 #[derive(Debug, Clone)]
 pub struct JumpBranch {
@@ -221,6 +247,8 @@ pub struct Function {
 #[derive(Debug, Clone)]
 pub enum Instruction {
     Load(Box<Load>),
+
+    Intrinsic(Box<Intrinsic>),
 
     GetGlobal(Box<GetGlobal>),
     GetTable(Box<GetTable>),
