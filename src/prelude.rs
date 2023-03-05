@@ -22,4 +22,9 @@
 
 pub use crate::ast::*;
 pub use crate::il::*;
-pub use crate::pipelines::{compile::*, decompile::*};
+
+#[cfg(feature = "compile")]
+pub use crate::pipelines::compile::*;
+
+#[cfg(feature = "decompile")]
+pub use crate::pipelines::decompile::*;

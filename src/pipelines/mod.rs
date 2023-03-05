@@ -20,7 +20,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#[cfg(feature = "compile")]
 pub(crate) mod compile;
+
+#[cfg(feature = "decompile")]
 pub(crate) mod decompile;
 
 /// Defines the level of optimisation that the LUNIR pipeline should apply, in general:
@@ -35,4 +38,8 @@ pub enum OptimizationLevel {
     None,
 }
 
+#[cfg(feature = "compile")]
 pub use compile::Compiler;
+
+#[cfg(feature = "decompile")]
+pub use decompile::Decompiler;
