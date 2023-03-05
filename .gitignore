@@ -12,3 +12,4 @@ Cargo.lock
 
 # macOS folder attributes
 .DS_Store
+**/.DS_Store
