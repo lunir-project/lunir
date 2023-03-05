@@ -21,7 +21,8 @@ itertools = "0.10.5"
 [features]
 compile = []
 decompile = []
-all = ["compile", "decompile"]
+ir = []
+all = ["compile", "decompile", "ir"]
 
 
 [profile.dev]
