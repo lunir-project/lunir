@@ -40,14 +40,14 @@ impl IdentifierString for String {
     }
 
     fn sanitize_identifier(&self) -> String {
-        let mut result = self
+        let mut result: String = self
             .chars()
             .filter_map(|c| match c {
                 '-' | ' ' | '\t' | '\n' => Some('_'),
                 _ if c.is_alphanumeric() || c == '_' => Some(c),
                 _ => None,
             })
-            .collect::<String>();
+            .collect();
 
         result = if !result.is_empty() {
             result
