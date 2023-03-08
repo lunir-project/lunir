@@ -23,10 +23,9 @@
 #![cfg(test)]
 
 use crate::ir::ast::{
-    expression::*, tree::*,
-    visitors::source_reconstructor::{
-        SourceReconstructor, SourceReconstructorSettingsBuilder,
-    },
+    expression::*,
+    tree::*,
+    visitors::source_reconstructor::{SourceReconstructor, SourceReconstructorSettingsBuilder},
 };
 use std::rc::Rc;
 
