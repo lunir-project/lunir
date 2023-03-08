@@ -22,8 +22,7 @@
 
 use std::{
     collections::HashMap,
-    fmt::{write, Debug},
-    num,
+    fmt::{Debug},
 };
 
 /// Represents the two states of a table, array (index-value pairs) and hashmap
@@ -514,7 +513,7 @@ pub enum Vararg {
 }
 
 impl Debug for Vararg {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, _f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::HasArg => todo!(),
             Self::IsVararg => todo!("variadic"),

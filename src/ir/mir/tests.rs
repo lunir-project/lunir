@@ -2,7 +2,7 @@
 
 use crate::prelude::{
     BinaryOp, BinaryOpKind, Condition, ConditionKind, ConditionalJump, Instruction, Jump,
-    JumpBranch, Load, Return, SetGlobal, Value,
+    JumpBranch, Load, Return, Value,
 };
 
 use super::cir::*;

@@ -2,14 +2,13 @@ use std::collections::HashMap;
 
 use petgraph::{
     data::Build,
-    dot::{Config, Dot},
+    dot::{Dot},
     graph::NodeIndex,
     prelude::DiGraph,
     stable_graph::IndexType,
-    Direction,
 };
 
-use crate::prelude::{IlChunk, Instruction, Jump};
+use crate::prelude::{IlChunk, Instruction};
 
 #[derive(Default)]
 pub(crate) struct CirGraph(DiGraph<IlChunk, bool, usize>);
@@ -188,8 +187,8 @@ pub(crate) fn into_cir_graph(instructions: Vec<Instruction>) {
 }
 
 impl From<IlChunk> for CirGraph {
-    fn from(chunk: IlChunk) -> Self {
-        let mut cfg = CirGraph::new();
+    fn from(_chunk: IlChunk) -> Self {
+        let _cfg = CirGraph::new();
 
         Self::default()
     }
