@@ -26,7 +26,6 @@ decompile = []
 ir = []
 all = ["compile", "decompile", "ir"]
 
-
 [profile.dev]
 opt-level = 1
 
