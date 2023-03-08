@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 use super::OptimizationLevel;
-use crate::{ast::tree::*, il::IlChunk};
+use crate::ir::{ast::tree::*, il::IlChunk};
 use std::sync::{Arc, Weak};
 
 #[doc(hidden)]
@@ -49,7 +49,7 @@ pub struct CompilationJob<T, F> {
 
 impl<T, F> CompilationJob<T, F> {
     /// Sets the optimization level of this `CompilationJob`.
-    fn optimization_level(mut self, level: OptimizationLevel) -> Self {
+    pub fn optimization_level(mut self, level: OptimizationLevel) -> Self {
         self.optimization_level = level;
 
         self
