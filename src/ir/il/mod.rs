@@ -20,7 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use std::{collections::HashMap, fmt::{Debug, write}, num};
+use std::{
+    collections::HashMap,
+    fmt::{write, Debug},
+    num,
+};
 
 /// Represents the two states of a table, array (index-value pairs) and hashmap
 /// (key-value pairs).
@@ -33,19 +37,19 @@ pub enum Table {
 impl Debug for Table {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut buf = String::with_capacity(32);
-        
+
         buf.push('{');
         match self {
             Self::Map(hash_map) => {
                 for v in hash_map.iter().enumerate() {
-                    buf.push_str(format!("[{:?}] {_eq:>8} {:?}, ", v.0, v.1, _eq = "=").as_str());
+                    buf.push_str(format!("[{:?}] {_eq:>4} {:?}, ", v.0, v.1, _eq = "=").as_str());
                 }
-            },
+            }
             Self::Array(array) => {
                 for v in array.iter().enumerate() {
                     buf.push_str(format!("{:?}, ", v.1).as_str());
                 }
-            } 
+            }
         }
         buf.push('}');
         write!(f, "{}", buf)
@@ -67,7 +71,7 @@ impl Debug for Value {
         match self {
             Self::Nil => write!(f, "nil"),
             Self::Boolean(b) => write!(f, "{b}"),
-            Self::ConstantIndex(i) |  Value::StackIndex(i) => write!(f, "{i}"),
+            Self::ConstantIndex(i) | Value::StackIndex(i) => write!(f, "{i}"),
             Self::Immediate(v) => write!(f, "{v}"),
         }
     }
@@ -89,7 +93,7 @@ impl Debug for Constant {
         match self {
             Self::Nil => write!(f, "nil"),
             Self::Boolean(b) => write!(f, "{b}"),
-            Self::Function(s) => write!(f, "{s:?}"), 
+            Self::Function(s) => write!(f, "{s:?}"),
             Self::Number(n) => write!(f, "{n}"),
             Self::String(s) => write!(f, "{s}"),
             Self::Table(t) => write!(f, "{t:?}"),
@@ -98,7 +102,7 @@ impl Debug for Constant {
 }
 
 /// A load operation with a destination index and a source value.
-#[derive(Clone)]
+#[derive(PartialEq, Clone)]
 pub struct Load {
     pub dest: usize,
     pub src: Value,
@@ -106,12 +110,12 @@ pub struct Load {
 
 impl Debug for Load {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} {_eq:>8} {:?}", self.dest, self.src, _eq = "=")
+        write!(f, "{} {_eq:>4} {:?}", self.dest, self.src, _eq = "=")
     }
 }
 
 /// A get global operation with a destination index and a source constant table index.
-#[derive(Clone)]
+#[derive(PartialEq, Clone)]
 pub struct GetGlobal {
     pub dest: usize,
     pub constant: usize,
@@ -119,11 +123,11 @@ pub struct GetGlobal {
 
 impl Debug for GetGlobal {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} {_eq:>8} {}", self.dest, self.constant, _eq = "=")
+        write!(f, "{} {_eq:>4} {}", self.dest, self.constant, _eq = "=")
     }
 }
 
-#[derive(Clone)]
+#[derive(PartialEq, Clone)]
 pub struct SetGlobal {
     pub src: usize,
     pub constant: usize,
@@ -131,13 +135,13 @@ pub struct SetGlobal {
 
 impl Debug for SetGlobal {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} {_eq:>8} {}", self.constant, self.src, _eq = "=")
+        write!(f, "{} {_eq:>4} {}", self.constant, self.src, _eq = "=")
     }
 }
 
 /// Perfoms a table index operation on the value at stack index `source` using the value
 /// at stack index `key`, then stores the result in stack index `dest`.
-#[derive(Clone)]
+#[derive(PartialEq, Clone)]
 pub struct GetTable {
     pub dest: usize,
     pub source: usize,
@@ -148,7 +152,7 @@ impl Debug for GetTable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{} {_eq:>8} {}[{:?}]",
+            "{} {_eq:>4} {}[{:?}]",
             self.dest,
             self.source,
             self.key,
@@ -158,7 +162,7 @@ impl Debug for GetTable {
 }
 
 /// Represents the kinds of supported binary operations.
-#[derive(Clone)]
+#[derive(PartialEq, Clone)]
 pub enum BinaryOpKind {
     Add,
     Concat,
@@ -198,7 +202,7 @@ impl Debug for BinaryOpKind {
 }
 
 /// A binary operation with an operator, a destination index, and left and right operands.
-#[derive(Clone)]
+#[derive(PartialEq, Clone)]
 pub struct BinaryOp {
     pub operator: BinaryOpKind,
     pub dest: usize,
@@ -211,7 +215,7 @@ impl Debug for BinaryOp {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{} {_eq:>8} {:?} {:?} {:?}",
+            "{} {_eq:>4} {:?} {:?} {:?}",
             self.dest,
             self.left,
             self.operator,
@@ -246,7 +250,7 @@ impl Debug for UnaryOpKind {
 }
 
 /// A unary operation with an operator, a destination index, and a single operand.
-#[derive(Clone)]
+#[derive(PartialEq, Clone)]
 pub struct UnaryOp {
     pub operator: UnaryOpKind,
     pub dest: usize,
@@ -258,7 +262,7 @@ impl Debug for UnaryOp {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{} {_eq:>8} {:?}{:?}",
+            "{} {_eq:>4} {:?}{:?}",
             self.dest,
             self.operator,
             self.left,
@@ -268,7 +272,7 @@ impl Debug for UnaryOp {
 }
 
 /// Represents the kinds of supported conditions.
-#[derive(Clone)]
+#[derive(PartialEq, Clone)]
 pub enum ConditionKind {
     Eq,
     Ge,
@@ -313,7 +317,7 @@ impl Debug for ConditionKind {
 }
 
 // A condition with a kind, a destination index, and left and right operands.
-#[derive(Clone)]
+#[derive(PartialEq, Clone)]
 pub struct Condition {
     pub kind: ConditionKind,
 
@@ -328,7 +332,7 @@ impl Debug for Condition {
 }
 
 /// All possible intrinsic operations
-#[derive(Clone)]
+#[derive(PartialEq, Clone)]
 pub enum IntrinsicKind {
     BitAnd(Value, Value),
     BitOr(Value, Value),
@@ -344,28 +348,28 @@ impl Debug for IntrinsicKind {
         match self {
             Self::BitAnd(lhs, rhs) => {
                 write!(f, "{:?} & {:?}", lhs, rhs)
-            },
+            }
             Self::BitOr(lhs, rhs) => {
                 write!(f, "{:?} | {:?}", lhs, rhs)
-            },
+            }
             Self::BitXor(lhs, rhs) => {
                 write!(f, "{:?} ^ {:?}", lhs, rhs)
-            },
+            }
             Self::BitNot(lhs) => {
                 write!(f, "!{:?}", lhs)
-            },
+            }
             Self::LeftShift(lhs, rhs) => {
                 write!(f, "{:?} << {:?}", lhs, rhs)
-            },
+            }
             Self::RightShift(lhs, rhs) => {
                 write!(f, "{:?} >> {:?}", lhs, rhs)
-            },
+            }
         }
     }
 }
 
 // Instruction to declare intrinsic.
-#[derive(Clone)]
+#[derive(PartialEq, Clone)]
 pub struct Intrinsic {
     pub kind: IntrinsicKind,
     pub dest: usize,
@@ -373,14 +377,14 @@ pub struct Intrinsic {
 
 impl Debug for Intrinsic {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} {_eq:>8} {:?}", self.dest, self.kind, _eq = "=")
+        write!(f, "{} {_eq:>4} {:?}", self.dest, self.kind, _eq = "=")
     }
 }
 
 /// Information about a program-counter-relative-jump, `start` is the program counter,
 /// `end` is the offset added to the counter, and `offset` is the total number of
 /// instructions skipped for the branch.
-#[derive(Debug, Clone)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct JumpBranch {
     pub start: usize,
     pub end: usize,
@@ -388,21 +392,21 @@ pub struct JumpBranch {
 }
 
 /// An unconditional jump.
-#[derive(Debug, Clone)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct Jump {
     pub branch: JumpBranch,
 }
 
 /// A conditional jump that only jumps if the `NOT` of the value at stack index `cond`
 /// evaluates to true.
-#[derive(Debug, Clone)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct JumpNot {
     pub branch: JumpBranch,
     pub cond: usize,
 }
 
 /// A jump with an attached condition.
-#[derive(Clone)]
+#[derive(PartialEq, Clone)]
 pub struct ConditionalJump {
     pub branch: JumpBranch,
     pub condition: Condition,
@@ -410,13 +414,20 @@ pub struct ConditionalJump {
 
 impl Debug for ConditionalJump {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "jump{:?} {} {_com:>20} {}", self.condition, self.branch.end, self.branch.offset, _com = ";")
+        write!(
+            f,
+            "jump{:?} {} {_com:>12} {}",
+            self.condition,
+            self.branch.end,
+            self.branch.offset,
+            _com = ";"
+        )
     }
 }
 
 /// Creates a new table at stack index `dest` with an initial size of `table_size` and
 /// `array_size` array elements.
-#[derive(Clone)]
+#[derive(PartialEq, Clone)]
 pub struct NewTable {
     pub dest: usize,
 
@@ -428,7 +439,7 @@ impl Debug for NewTable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{} {_eq:>8} newtable {arraysize} {tablesize} {_com:>20} {arraysize}/{tablesize}",
+            "{} {_eq:>4} newtable {arraysize} {tablesize} {_com:>12} {arraysize}/{tablesize}",
             self.dest,
             arraysize = self.array_size,
             tablesize = self.table_size,
@@ -440,7 +451,7 @@ impl Debug for NewTable {
 
 /// Represents either a number or a variable number of values that approach the top of the
 ///  stack.
-#[derive(Clone)]
+#[derive(PartialEq, Clone)]
 pub enum OptVariable {
     Variable,
     Number(usize),
@@ -457,7 +468,7 @@ impl Debug for OptVariable {
 
 /// Calls the function at stack index `callee` with `num_args` ahead of it on the stack,
 /// then returns a `num_returns` number of results.
-#[derive(Clone)]
+#[derive(PartialEq, Clone)]
 pub struct Call {
     pub callee: usize,
 
@@ -470,7 +481,7 @@ impl Debug for Call {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{:?} {_eq:>8} {}({}{:?})",
+            "{:?} {_eq:>4} {}({}{:?})",
             self.num_returns,
             self.callee,
             if self.self_call { "self, " } else { "" },
@@ -482,7 +493,7 @@ impl Debug for Call {
 
 /// Performs a return from the current chunk, passing all values fr om stack index
 /// `result_start` up to `result_start + result_count` to the caller.
-#[derive(Clone)]
+#[derive(PartialEq, Clone)]
 pub struct Return {
     pub result_start: usize,
     pub result_count: usize,
@@ -532,7 +543,7 @@ impl Debug for Function {
 }
 
 /// All possible LUNIR intermediate language instructions.
-#[derive(Debug, Clone)]
+#[derive(PartialEq, Debug, Clone)]
 pub enum Instruction {
     Load(Box<Load>),
 
@@ -556,7 +567,7 @@ pub enum Instruction {
 }
 
 /// A chunk of code in LUNIR's intermediate language.
-#[derive(Clone)]
+#[derive(PartialEq, Clone)]
 pub struct IlChunk(Vec<Instruction>);
 
 impl IlChunk {
