@@ -2,7 +2,7 @@
 
 use crate::prelude::{
     BinaryOp, BinaryOpKind, Condition, ConditionKind, ConditionalJump, Instruction, Jump,
-    JumpBranch, Load, Return, Value, SetGlobal
+    JumpBranch, Load, Return, SetGlobal, Value,
 };
 
 use super::cir::*;
@@ -50,11 +50,11 @@ fn numeric_while_loop() {
 #[test]
 fn some_other_code() {
     // let code2 = vec![
-    //     Instruction::Load(Box::new(Load { 
-    //         dest: 0, 
-    //         src: Value::StackIndex(0) 
+    //     Instruction::Load(Box::new(Load {
+    //         dest: 0,
+    //         src: Value::StackIndex(0)
     //     })),
-    //     Instruction::SetGlobal(Box::new(SetGlobal { 
+    //     Instruction::SetGlobal(Box::new(SetGlobal {
     //         src: -1,
     //         constant: 0
     //     },
