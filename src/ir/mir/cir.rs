@@ -1,12 +1,6 @@
 use std::collections::HashMap;
 
-use petgraph::{
-    data::Build,
-    dot::{Dot},
-    graph::NodeIndex,
-    prelude::DiGraph,
-    stable_graph::IndexType,
-};
+use petgraph::{data::Build, dot::Dot, graph::NodeIndex, prelude::DiGraph, visit::EdgeRef};
 
 use crate::prelude::{IlChunk, Instruction};
 
@@ -46,6 +40,7 @@ fn split_blocks(
     src_block_index: usize,
     target_block_index: usize,
     graph: &mut DiGraph<IlChunk, bool, usize>,
+    removals: &mut Vec<(usize, usize, usize)>,
     is_negated: bool,
 ) -> NodeIndex<usize> {
     let src_block = blocks.get(&src_block_index).unwrap();
@@ -71,6 +66,12 @@ fn split_blocks(
             );
 
             graph.add_edge(src_node_index.into(), trailing_block_index.into(), true);
+
+            removals.push((
+                target_block_index.into(),
+                leading_block_index.index(),
+                trailing_block_index.index(),
+            ));
 
             return src_node_index;
         }
@@ -101,6 +102,8 @@ pub(crate) fn into_cir_graph(instructions: Vec<Instruction>) {
 
     let graph = cfg.inner_mut();
 
+    let mut to_be_removed = vec![];
+
     for (pc, src_block) in blocks.iter() {
         match src_block.last() {
             Some(Instruction::Jump(data)) => {
@@ -115,7 +118,14 @@ pub(crate) fn into_cir_graph(instructions: Vec<Instruction>) {
                         graph.add_edge(from_block, to_block, true);
                     }
                     None => {
-                        split_blocks(&blocks, *pc, target_block_index, graph, false);
+                        split_blocks(
+                            &blocks,
+                            *pc,
+                            target_block_index,
+                            graph,
+                            &mut to_be_removed,
+                            false,
+                        );
                     }
                 };
             }
@@ -125,19 +135,25 @@ pub(crate) fn into_cir_graph(instructions: Vec<Instruction>) {
 
                 let source = match blocks.get(&target_block_index) {
                     Some(target_block) => {
-                        let original_source = graph_get_or_insert(graph, IlChunk::from(*src_block));
+                        let src_node = graph_get_or_insert(graph, IlChunk::from(*src_block));
 
-                        let to = graph_get_or_insert(graph, IlChunk::from(*target_block));
+                        let to_node = graph_get_or_insert(graph, IlChunk::from(*target_block));
 
-                        graph.add_edge(original_source.into(), to.into(), true);
+                        graph.add_edge(src_node.into(), to_node.into(), true);
 
-                        original_source
+                        src_node
                     }
                     None => {
-                        let original_source =
-                            split_blocks(&blocks, *pc, target_block_index, graph, false);
+                        let src_node = split_blocks(
+                            &blocks,
+                            *pc,
+                            target_block_index,
+                            graph,
+                            &mut to_be_removed,
+                            false,
+                        );
 
-                        original_source
+                        src_node
                     }
                 };
 
@@ -162,8 +178,14 @@ pub(crate) fn into_cir_graph(instructions: Vec<Instruction>) {
                         original_source
                     }
                     None => {
-                        let original_source =
-                            split_blocks(&blocks, *pc, target_block_index, graph, true);
+                        let original_source = split_blocks(
+                            &blocks,
+                            *pc,
+                            target_block_index,
+                            graph,
+                            &mut to_be_removed,
+                            true,
+                        );
 
                         original_source.into()
                     }
@@ -177,6 +199,46 @@ pub(crate) fn into_cir_graph(instructions: Vec<Instruction>) {
             }
             _ => continue,
         }
+    }
+
+    for (block_index, leading_block_index, trailing_block_index) in to_be_removed {
+        let mut edge_data = vec![];
+
+        for edge in graph.edges(block_index.into()) {
+            edge_data.push((
+                edge.id(),
+                edge.source().index(),
+                edge.target().index(),
+                edge.weight().clone(),
+            ));
+        }
+
+        for datum in edge_data {
+            let (index, source, target, weight) = datum;
+
+            graph.remove_edge(index.into());
+
+            if source == block_index {
+                if target == source {
+                    dbg!(graph.node_weight(block_index.into()));
+                    graph
+                        .add_edge(
+                            trailing_block_index.into(),
+                            dbg!(leading_block_index.into()),
+                            weight,
+                        )
+                        .index();
+                } else {
+                    graph.add_edge(trailing_block_index.into(), dbg!(target.into()), weight);
+                }
+            } else {
+                graph.add_edge(source.into(), leading_block_index.into(), weight);
+            }
+
+            graph.remove_edge(index);
+        }
+
+        graph.remove_node(block_index.into());
     }
 
     let graph = cfg.inner();
