@@ -1,5 +1,4 @@
 #![cfg(test)]
-
 use crate::prelude::{
     BinaryOp, BinaryOpKind, Condition, ConditionKind, ConditionalJump, Instruction, Jump,
     JumpBranch, Load, Return, Value,
