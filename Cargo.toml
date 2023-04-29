@@ -8,17 +8,19 @@ description = "A universal intermediate representation oriented towards Lua."
 homepage = "https://github.com/lunir-project/lunir"
 repository = "https://github.com/lunir-project/lunir"
 readme = "README.md"
-license = "MIT"
+license = "MIT OR Apache-2.0"
 
 [package.metadata.msrv]
 msrv = "1.62.1"
 
 [dependencies]
 anyhow = "1.0.69"
+cranelift-entity = "0.95.0"
 daggy = "0.8.0"
 derive_builder = "0.12.0"
 itertools = "0.10.5"
 petgraph = "0.6.3"
+tinyvec = { version = "1.6.0", features = ["rustc_1_57", "std"] }
 
 [features]
 compile = []

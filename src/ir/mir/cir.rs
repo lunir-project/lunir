@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use petgraph::{data::Build, dot::Dot, graph::NodeIndex, prelude::DiGraph, visit::EdgeRef};
 
-use crate::prelude::{IlChunk, Instruction};
+use crate::ir::il::{IlChunk, Instruction};
 
 #[derive(Default)]
 pub(crate) struct CirGraph(DiGraph<IlChunk, bool, usize>);

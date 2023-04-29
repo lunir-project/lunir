@@ -19,4 +19,4 @@ jobs:
     - name: Build
       run: cargo build --verbose --profile actions
     - name: Run tests
-      run: cargo test --verbose -- profile actions      
+      run: cargo test --verbose -- profile actions

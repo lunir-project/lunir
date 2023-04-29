@@ -1,5 +1,5 @@
 #![cfg(test)]
-use crate::prelude::{
+use crate::ir::il::{
     BinaryOp, BinaryOpKind, Condition, ConditionKind, ConditionalJump, Instruction, Jump,
     JumpBranch, Load, Return, Value,
 };
