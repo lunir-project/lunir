@@ -82,7 +82,10 @@ impl SourceReconstructor {
 
     pub fn source(self) -> String {
         match self.settings.custom_header {
-            Some(header) => format!("// {}\n{}", header, self.source),
+            Some(header) if header.lines().count() == 1 => {
+                format!("-- {}\n{}", header, self.source)
+            }
+            Some(header) => format!("--[[{}]]\n{}", header, self.source),
             None => self.source,
         }
     }
