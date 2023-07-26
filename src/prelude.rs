@@ -20,6 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-pub use crate::ast::*;
-pub use crate::il::*;
-pub use crate::pipelines::{compile::*, decompile::*};
+#[cfg(feature = "ir")]
+pub use crate::ir::{ast::*, il::*};
+
+#[cfg(feature = "compile")]
+pub use crate::pipelines::compile::*;
+
+#[cfg(feature = "decompile")]
+pub use crate::pipelines::decompile::*;

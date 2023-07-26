@@ -22,11 +22,10 @@
 
 #![cfg(test)]
 
-use crate::{
-    ast::{expression::*, tree::*},
-    prelude::visitors::source_reconstructor::{
-        SourceReconstructor, SourceReconstructorSettingsBuilder,
-    },
+use crate::ir::ast::{
+    expression::*,
+    tree::*,
+    visitors::source_reconstructor::{SourceReconstructor, SourceReconstructorSettingsBuilder},
 };
 use std::rc::Rc;
 

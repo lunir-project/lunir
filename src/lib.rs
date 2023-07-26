@@ -20,8 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-pub mod ast;
-pub mod il;
-pub mod lifter;
+#![doc = include_str!("../README.md")]
+
+#[cfg(feature = "ir")]
+pub mod ir;
+
+#[cfg(not(feature = "ir"))]
+pub(crate) mod ir;
+
+/// The LUNIR compilation and decompilation pipelines, requires the `compile` or `decompile` features to be enabled..
+#[cfg(any(feature = "compile", feature = "decompile"))]
 pub mod pipelines;
+
+/// Commonly used types and functions.
 pub mod prelude;

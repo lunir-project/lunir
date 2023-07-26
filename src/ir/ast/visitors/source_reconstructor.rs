@@ -20,7 +20,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use crate::ast::{expression::*, statement::*, tree::*};
+use crate::ir::ast::expression::*;
+use crate::ir::ast::statement::*;
+use crate::ir::ast::tree::*;
+
 use derive_builder::Builder;
 
 #[derive(Default)]

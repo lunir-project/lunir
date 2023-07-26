@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 use super::OptimizationLevel;
-use crate::{ast::tree::*, il::IlChunk};
+use crate::ir::{ast::tree::*, il::IlChunk};
 use std::{
     marker::PhantomData,
     sync::{Arc, Weak},
