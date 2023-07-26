@@ -31,7 +31,7 @@ Contributions to HIR and the entire LUNIR project are highly welcome! If you fin
 
 Before contributing, please read the [contribution guidelines](/CONTRIBUTING.md) to ensure a smooth collaboration process.
 
-If you're looking to contribute check out the *[roadmap](hir/ROADMAP.md)* for a nice list of needed bug-fixes and features to work on.
+If you're looking to contribute check out the *[roadmap](ROADMAP.md)* for a nice list of needed bug-fixes and features to work on.
 
 ### License
 

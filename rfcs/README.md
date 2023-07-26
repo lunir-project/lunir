@@ -12,13 +12,13 @@ Then, decide if your request belongs in one of the existing catergories listed b
 
 | Category     |
 |--------------|
-| [HIR](rfcs/hir/)  |
-| [MIR](rfcs/mir/)  |
-| [IL](rfcs/il/)    |
+| [HIR](hir/)  |
+| [MIR](mir/)  |
+| [IL](il/)    |
 
 If your RFC does not fit into any of the listed categories, create an issue requesting the addition of a new category.
 
-Once you've found the correct category, click on it and make a copy of *[TEMPLATE.md](rfcs/TEMPLATE.md)*.
+Once you've found the correct category, click on it and make a copy of *[TEMPLATE.md](TEMPLATE.md)*.
 
 Rename the new file to a descriptive title in snake_case, follow the template, then make a pull request with your RFC addition.
 

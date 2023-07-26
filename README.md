@@ -43,4 +43,7 @@ The Minimum Supported Rust Version for this crate is **1.58.1**.
 
 ## License
 
-LUNIR is an open-source project released under the MIT License. See the [LICENSE](/LICENSE) file for more details.
+LUNIR is an open-source project released under the following licenses:
+
+- [MIT License](/LICENSE-MIT)
+- [Apache License 2.0](/LICENSE-APACHE)
