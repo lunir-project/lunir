@@ -1,6 +1,10 @@
+
+// TODO: remove once everything is used
+#![allow(unused)]
+
 use std::collections::HashMap;
 
-use petgraph::{data::Build, dot::Dot, graph::NodeIndex, prelude::DiGraph, visit::EdgeRef};
+use petgraph::{dot::Dot, graph::NodeIndex, prelude::DiGraph, visit::EdgeRef};
 
 use crate::ir::il::{IlChunk, Instruction};
 
