@@ -8,11 +8,12 @@ Before a change is implemented, a design document called an RFC explains its jus
 
 Determine if your request belongs in one of the existing catergories listed below.
 
-| Category     |
-|--------------|
-| [HIR](hir/)  |
-| [MIR](mir/)  |
-| [IL](il/)    |
+| Category        |
+|-----------------|
+| [HIR](hir/)     |
+| [MIR](mir/)     |
+| [IL](il/)       |
+| [Other](other/) |
 
 If your RFC does not fit into any of the listed categories, create an issue requesting the addition of a new category or place it in the other category, based on your judgement.
 
