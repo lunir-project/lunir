@@ -20,9 +20,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+// TODO: remove once everything is used
+#![allow(unused)]
+
 use std::{
     collections::HashMap,
-    fmt::{Debug},
+    fmt::Debug,
 };
 
 /// Represents the two states of a table, array (index-value pairs) and hashmap
