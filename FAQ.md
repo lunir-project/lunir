@@ -25,7 +25,7 @@ LUNIR is also quite useful for translating between various Lua source/bytecode v
 
 ## *Can I use LUNIR comercially?*
 
-Yes, LUNIR adheres to the MIT license, which allows for unrestricted commercial usage; the only requirement is that LUNIR be given attribution whenever it is utilized.
+Yes, LUNIR adheres to the MIT and Apache 2.0 licenses, which allow for unrestricted commercial usage. The only requirement is that LUNIR be given attribution whenever it is utilized.
 
 ## *How can I contribute to LUNIR?*
 
