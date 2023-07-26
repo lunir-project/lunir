@@ -1,14 +1,12 @@
 # RFCs (*Request for Comments*)
 
-Welcome to the RFCs (Request for Comments) section, which provides ideas for new features, design updates, or significant improvements.
+Welcome to the RFCs (Request for Comments) section, which provides a mechanism to sugggest ideas, new features, design updates, or significant improvements.
 
-Before a change is implemented, a design document called an RFC explains its justification, design factors, and potential effects.
+Before a change is implemented, a design document called an RFC explains its justification, design factors, potential effects, and any prior art.
 
 ## How to contribute
 
-First, make sure your feature request doesn't bring any significant breaking changes to the codebase and retains backwards compatibility.
-
-Then, decide if your request belongs in one of the existing catergories listed below.
+Determine if your request belongs in one of the existing catergories listed below.
 
 | Category     |
 |--------------|
@@ -16,7 +14,7 @@ Then, decide if your request belongs in one of the existing catergories listed b
 | [MIR](mir/)  |
 | [IL](il/)    |
 
-If your RFC does not fit into any of the listed categories, create an issue requesting the addition of a new category.
+If your RFC does not fit into any of the listed categories, create an issue requesting the addition of a new category or place it in the other category, based on your judgement.
 
 Once you've found the correct category, click on it and make a copy of *[TEMPLATE.md](TEMPLATE.md)*.
 
