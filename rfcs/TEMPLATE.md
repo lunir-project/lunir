@@ -22,6 +22,10 @@ A detailed description of how the feature will be implemented, any technical inf
 
 Describe any disadvantages this feature may have, explain why they are worth the benefit of having this feature implemented.
 
+## Prior Art
+
+Show examples, if any, of a previous implementation of this feature, as previous insight is beneficial to prevent facing the same problems others have faced before.
+
 ## Alternatives
 
 Describe any alternatives to this feature, and why the proposed feature is superior.
