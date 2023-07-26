@@ -22,6 +22,25 @@ You can create an *[issue](../../issues)* detailing what the problem is and how 
 
 If you're unsure whether something is a problem, create a *[topic on Github Discussions](../../discussions)* outlining your concerns.
 
+## Commit Format
+
+The LUNIR project follows the "If merged, this commit ..." philosophy, wherein the commt message must be no longer than 50 characters, modifies exactly 1 file, and makes grammatical sense when appended to the phase "If merged, this commit ...".
+
+### Examples
+
+#### Incorrect Messages
+
+- "Fixes MIR inlining" : Capitalization error; "If merged, this commit Fixes MIR inlining."
+- "fix HIR lowering" : Grammatical error; "If merged, this commit fix MIR lowering."
+- "redoes MIR" : Commit scope error; Does not only affect 1 file.
+
+
+#### Correct Messages
+
+- "fixes MIR inlining" : "If merged, this commit fixes MIR"
+- "fixes HIR lowering" : "If merged, this commit fixes HIR lowering"
+
+
 ## License
 
 LUNIR is an open-source project released under the following licenses:
