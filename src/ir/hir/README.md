@@ -13,7 +13,7 @@ HIR is an acronym for **H**igh-level **I**ntermediate **R**epresentation. It ser
 
 ## Introduction
 
-HIR is a key component of LUNIR, serving as the bridge between higher-level source code and lower-level Intermediate Representations (MIR and IL). It fills the gap between the complexity of the source code and the optimizations carried out at lower levels.
+HIR is a key component of LUNIR, serving as the bridge between higher-level source code and lower-level intermediate representations (MIR and IL). It bridges the gap between the source code and the optimizations carried out at lower levels.
 
 HIR makes it possible for the compiler to do multiple analyses and transformations more efficiently by providing an abstract and organized representation of the source code. To help generate optimal code, it simplifies difficult expressions, resolves constant values, and does extensive type analysis.
 
@@ -31,7 +31,7 @@ Contributions to HIR and the entire LUNIR project are highly welcome! If you fin
 
 Before contributing, please read the [contribution guidelines](/CONTRIBUTING.md) to ensure a smooth collaboration process.
 
-If you're looking to contribute check out the *[roadmap](ROADMAP.md)* for a nice list of needed bug-fixes and features to work on.
+If you're looking to contribute check out the *[roadmap](./ROADMAP.md)* for a nice list of needed bug-fixes and features to work on.
 
 ### License
 
