@@ -21,7 +21,7 @@ Compilation speed with LUNIR will unavoidably be slower than with other compiler
 
 LUNIR is an environment-aware code analysis tool that may be used with an IDE or linter to do high-quality analysis and type inference.
 
-LUNIR is also quite useful for translating between various Lua source/bytecode versions. You can also utilize the IR to develop your own language translates into Lua at either the source or bytecode levels.
+LUNIR is also quite useful for translating between various Lua source/bytecode versions. You can also utilize the IR to develop your own language that translates into Lua at either the source or bytecode levels.
 
 ## *Can I use LUNIR comercially?*
 
