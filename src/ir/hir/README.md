@@ -35,4 +35,9 @@ If you're looking to contribute check out the *[roadmap](ROADMAP.md)* for a nice
 
 ### License
 
-LUNIR is an open-source project released under the MIT License. See the [LICENSE](/LICENSE) file for more details. By contributing to this project, you agree to abide by the terms of the license and to respect the open-source community guidelines.
+LUNIR is an open-source project released under the following licenses:
+
+- [MIT License](/LICENSE-MIT)
+- [Apache License 2.0](/LICENSE-APACHE)
+
+By contributing to this project, you agree to abide by the terms of the licenses and to respect the open-source community guidelines.
