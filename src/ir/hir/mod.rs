@@ -21,31 +21,13 @@ pub struct HirNode {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum HirTyKind {
-    Bool,
-    Number,
-    String,
-    Userdata,
-    Table,
-    Tuple(Vec<HirTy>),
-    Union(Vec<HirTy>),
-    Function(Box<HirFunctionSignature>),
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct HirFunctionSignature {
     parameters: Vec<HirTy>,
     return_type: HirTy,
 }
-
-#[derive(Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct HirMetatable {
-    add: Option<HirNode>,
-}
-
 #[derive(Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct HirTy {
-    ty: Option<HirTyKind>,
+    data: (),
 }
 
 // for when ur back
