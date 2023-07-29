@@ -30,10 +30,6 @@ pub struct HirTy {
     data: (),
 }
 
-// for when ur back
-// I'm considering this because it can be applied on all layers of abstraction that we have here
-// and we can use it to constrain generics for simple functions that require a fold
-// we can extend the trait with a `fold_constant` function that takes a SymbolicExecution context
 pub trait ConstantEvaluable {
     fn is_constant(&self) -> bool;
 }
