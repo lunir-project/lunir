@@ -46,13 +46,12 @@ pub struct HirMetatable {
 #[derive(Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct HirTy {
     ty: Option<HirTyKind>,
-
 }
 
 // for when ur back
 // I'm considering this because it can be applied on all layers of abstraction that we have here
-// and we can use it to constrain generics for simple functions that require a fold 
-// we can extend the trait with a `fold_constant` function that takes a SymbolicExecution context 
+// and we can use it to constrain generics for simple functions that require a fold
+// we can extend the trait with a `fold_constant` function that takes a SymbolicExecution context
 pub trait ConstantEvaluable {
     fn is_constant(&self) -> bool;
 }
@@ -60,8 +59,7 @@ pub trait ConstantEvaluable {
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum HirExpressionKind {
     Nil,
-    // TODO: lifering has no PartialOrd or Ord! Implement a wrapper type? Or update lifering?
-    //Number(FloatingPointComponents),
+    Number(FloatingPointComponents<f64>),
     LuaString(String),
     Boolean(bool),
 }
@@ -75,7 +73,7 @@ pub struct HirExpression {
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum HirStatementKind {
     IfStatement,
-    Loop
+    Loop,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
