@@ -56,7 +56,7 @@ pub trait ConstantEvaluable {
     fn is_constant(&self) -> bool;
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Hash)]
 pub enum HirExpressionKind {
     Nil,
     Number(FloatingPointComponents<f64>),
