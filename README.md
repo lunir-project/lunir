@@ -7,10 +7,10 @@
 
 LUNIR (pronounced `/ˈluː.nɚ/`) is a pun on "lunar," and an acronym for **L**ua **Un**iversal **I**ntermediate **R**epresentation.
 
-## Table of Contents
-
+<details open="open">
+<summary>Table of Contents</summary>
+  
 - [LUNIR](#lunir---)
-  - [Table of Contents](#table-of-contents)
   - [IR](#ir)
     - [HIR](/src/ir/hir)
     - [MIR](/src/ir/mir)
@@ -18,6 +18,8 @@ LUNIR (pronounced `/ˈluː.nɚ/`) is a pun on "lunar," and an acronym for **L**u
   - [Questions](#questions)
   - [MSRV](#msrv)
   - [License](#license)
+    
+</details>
 
 ## IR
 
