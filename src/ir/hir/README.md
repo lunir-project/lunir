@@ -2,14 +2,16 @@
 
 HIR is an acronym for **H**igh-level **I**ntermediate **R**epresentation. It serves as a compiler-friendly Abstract Syntax Tree (AST) that simplifies indirections, performs advanced type analysis, and handles constant resolution.
 
-## Table of Contents
+<details open="open">
+<summary>Table of Contents</summary>
 
 - [HIR - High-level Intermediate Representation](#hir---high-level-intermediate-representation)
-  - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
   - [Features](#features)
   - [Contributing](#contributing)
     - [License](#license)
+
+</details>
 
 ## Introduction
 
