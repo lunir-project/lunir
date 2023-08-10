@@ -1,16 +1,29 @@
-[mit-badge]: https://img.shields.io/badge/license-MIT-blue.svg
-[mit-url]: https://github.com/lunir-project/lunir/blob/main/LICENSE
+[apache-badge]: https://img.shields.io/github/license/lunir-project/lunir.svg?style=flat-square&color=00007F
+[apache-url]: /LICENSE-APACHE
+
+[rust-vers-badge]: https://img.shields.io/badge/Rust-1.58.1+-B7410E
+[rust-vers-url]: https://releases.rs/docs/1.58.1
+
 [build-badge]: https://github.com/lunir-project/lunir/actions/workflows/rust.yml/badge.svg
 [build-url]: https://github.com/lunir-project/lunir/actions/workflows/rust.yml
 
-# LUNIR • [![MIT licensed][mit-badge]][mit-url] [![Build][build-badge]][build-url]
+<div align="center">
+
+  # LUNIR
+
+  <h2>Lua Universal Intermediate Representation</h2>
+  <br />
+  
+  [![Apache licensed][apache-badge]][apache-url] [![Build][build-badge]][build-url] [![Rust Version][rust-vers-badge]][rust-vers-url]
+  <br />
+</div>
 
 LUNIR (pronounced `/ˈluː.nɚ/`) is a pun on "lunar," and an acronym for **L**ua **Un**iversal **I**ntermediate **R**epresentation.
 
 <details open="open">
 <summary>Table of Contents</summary>
   
-- [LUNIR](#lunir---)
+- [LUNIR](#lunir)
   - [IR](#ir)
     - [HIR](/src/ir/hir)
     - [MIR](/src/ir/mir)
