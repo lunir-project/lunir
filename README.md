@@ -18,7 +18,11 @@
   <br />
 </div>
 
-LUNIR (pronounced `/ˈluː.nɚ/`) is a pun on "lunar," and an acronym for **L**ua **Un**iversal **I**ntermediate **R**epresentation.
+
+<div align="center">
+
+LUNIR (pronounced `/ˈluː.nɚ/`) is a pun on "lunar," and an acronym for **L**ua **Un**iversal **I**ntermediate **R**epresentation,<br>capable of targeting Lua 5.*x* and Luau.
+</div>
 
 <details open="open">
 <summary>Table of Contents</summary>
