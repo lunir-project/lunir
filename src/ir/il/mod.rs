@@ -15,16 +15,19 @@
 // TODO: remove once everything is used
 #![allow(unused)]
 
-use std::{
-    collections::HashMap,
-    fmt::Debug,
-};
+use std::{collections::HashMap, fmt::Debug};
+
+use itertools::Itertools;
 
 /// Represents the two states of a table, array (index-value pairs) and hashmap
 /// (key-value pairs).
 #[derive(Clone)]
 pub enum Table {
-    Map(HashMap<Value, Value>),
+    // Maps must not use HashMap.
+    // This is because in Lua, you can have the same key multiple times, but with a different value.
+    // Using a Vec prohibits the hashmap from overwriting data, allowing you to see all refs to the keys
+    // and their values.
+    Map(Vec<(Value, Value)>),
     Array(Vec<Value>),
 }
 
@@ -35,18 +38,19 @@ impl Debug for Table {
         buf.push('{');
         match self {
             Self::Map(hash_map) => {
-                for v in hash_map.iter().enumerate() {
-                    buf.push_str(format!("[{:?}] {_eq:>4} {:?}, ", v.0, v.1, _eq = "=").as_str());
-                }
+                buf.push_str(
+                    &hash_map
+                        .iter()
+                        .map(|(k, v)| format!("[{k:?}] {_eq:>4} {v:?}", _eq = "="))
+                        .join(", "),
+                );
             }
             Self::Array(array) => {
-                for v in array.iter().enumerate() {
-                    buf.push_str(format!("{:?}, ", v.1).as_str());
-                }
+                buf.push_str(&array.iter().map(|v| format!("{v:?}")).join(", "));
             }
         }
         buf.push('}');
-        write!(f, "{}", buf)
+        write!(f, "{buf}")
     }
 }
 
@@ -62,12 +66,16 @@ pub enum Value {
 
 impl Debug for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::Nil => write!(f, "nil"),
-            Self::Boolean(b) => write!(f, "{b}"),
-            Self::ConstantIndex(i) | Value::StackIndex(i) => write!(f, "{i}"),
-            Self::Immediate(v) => write!(f, "{v}"),
-        }
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::Nil => "nil".into(),
+                Self::Boolean(b) => format!("{b}"),
+                Self::ConstantIndex(i) | Value::StackIndex(i) => format!("{i}"),
+                Self::Immediate(v) => format!("{v}"),
+            }
+        )
     }
 }
 
@@ -84,14 +92,18 @@ pub enum Constant {
 // L
 impl Debug for Constant {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::Nil => write!(f, "nil"),
-            Self::Boolean(b) => write!(f, "{b}"),
-            Self::Function(s) => write!(f, "{s:?}"),
-            Self::Number(n) => write!(f, "{n}"),
-            Self::String(s) => write!(f, "{s}"),
-            Self::Table(t) => write!(f, "{t:?}"),
-        }
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::Nil => "nil".into(),
+                Self::Boolean(b) => format!("{b}"),
+                Self::Function(s) => format!("{s:?}"),
+                Self::Number(n) => format!("{n}"),
+                Self::String(s) => s.into(),
+                Self::Table(t) => format!("{t:?}"),
+            }
+        )
     }
 }
 
@@ -169,29 +181,19 @@ pub enum BinaryOpKind {
 
 impl Debug for BinaryOpKind {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match *self {
-            BinaryOpKind::Add => {
-                write!(f, "+")
+        write!(
+            f,
+            "{}",
+            match *self {
+                BinaryOpKind::Add => "+",
+                BinaryOpKind::Sub => "-",
+                BinaryOpKind::Mul => "*",
+                BinaryOpKind::Div => "/",
+                BinaryOpKind::Mod => "%",
+                BinaryOpKind::Pow => "^",
+                BinaryOpKind::Concat => "..",
             }
-            BinaryOpKind::Sub => {
-                write!(f, "-")
-            }
-            BinaryOpKind::Mul => {
-                write!(f, "*")
-            }
-            BinaryOpKind::Div => {
-                write!(f, "/")
-            }
-            BinaryOpKind::Mod => {
-                write!(f, "%")
-            }
-            BinaryOpKind::Pow => {
-                write!(f, "^")
-            }
-            BinaryOpKind::Concat => {
-                write!(f, "..")
-            }
-        }
+        )
     }
 }
 
@@ -229,17 +231,15 @@ pub enum UnaryOpKind {
 
 impl Debug for UnaryOpKind {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match *self {
-            UnaryOpKind::Len => {
-                write!(f, "#")
+        write!(
+            f,
+            "{}",
+            match *self {
+                UnaryOpKind::Len => '#',
+                UnaryOpKind::Not => '!',
+                UnaryOpKind::Neg => '-',
             }
-            UnaryOpKind::Not => {
-                write!(f, "!")
-            }
-            UnaryOpKind::Neg => {
-                write!(f, "-")
-            }
-        }
+        )
     }
 }
 
@@ -281,32 +281,20 @@ pub enum ConditionKind {
 
 impl Debug for ConditionKind {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match *self {
-            ConditionKind::Eq => {
-                write!(f, "eq")
+        write!(
+            f,
+            "{}",
+            match *self {
+                ConditionKind::Eq => "eq",
+                ConditionKind::Ge => "ge",
+                ConditionKind::Gt => "gt",
+                ConditionKind::Ne => "ne",
+                ConditionKind::Lt => "lt",
+                ConditionKind::Le => "le",
+                ConditionKind::And => "and",
+                ConditionKind::Or => "or",
             }
-            ConditionKind::Ge => {
-                write!(f, "ge")
-            }
-            ConditionKind::Gt => {
-                write!(f, "gt")
-            }
-            ConditionKind::Ne => {
-                write!(f, "ne")
-            }
-            ConditionKind::Lt => {
-                write!(f, "lt")
-            }
-            ConditionKind::Le => {
-                write!(f, "le")
-            }
-            ConditionKind::And => {
-                write!(f, "and")
-            }
-            ConditionKind::Or => {
-                write!(f, "or")
-            }
-        }
+        )
     }
 }
 
@@ -337,28 +325,43 @@ pub enum IntrinsicKind {
     RightShift(Value, Value),
 }
 
+impl IntrinsicKind {
+    fn is_unary(&self) -> bool {
+        match self {
+            Self::BitNot(_) => true,
+            _ => false,
+        }
+    }
+
+    fn is_binary(&self) -> bool {
+        !self.is_unary()
+    }
+}
+
 impl Debug for IntrinsicKind {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::BitAnd(lhs, rhs) => {
-                write!(f, "{:?} & {:?}", lhs, rhs)
+        write!(
+            f,
+            "{}",
+            if self.is_unary() {
+                if let Self::BitNot(op) = self {
+                    format!("!{op:?}")
+                } else {
+                    unreachable!()
+                }
+            } else {
+                let (op, lhs, rhs) = match self {
+                    Self::BitAnd(lhs, rhs) => ("&", lhs, rhs),
+                    Self::BitOr(lhs, rhs) => ("|", lhs, rhs),
+                    Self::BitXor(lhs, rhs) => ("^", lhs, rhs),
+                    Self::LeftShift(lhs, rhs) => ("<<", lhs, rhs),
+                    Self::RightShift(lhs, rhs) => (">>", lhs, rhs),
+                    _ => unreachable!(),
+                };
+
+                format!("{lhs:?} {op} {rhs:?}")
             }
-            Self::BitOr(lhs, rhs) => {
-                write!(f, "{:?} | {:?}", lhs, rhs)
-            }
-            Self::BitXor(lhs, rhs) => {
-                write!(f, "{:?} ^ {:?}", lhs, rhs)
-            }
-            Self::BitNot(lhs) => {
-                write!(f, "!{:?}", lhs)
-            }
-            Self::LeftShift(lhs, rhs) => {
-                write!(f, "{:?} << {:?}", lhs, rhs)
-            }
-            Self::RightShift(lhs, rhs) => {
-                write!(f, "{:?} >> {:?}", lhs, rhs)
-            }
-        }
+        )
     }
 }
 
@@ -508,12 +511,16 @@ pub enum Vararg {
 }
 
 impl Debug for Vararg {
-    fn fmt(&self, _f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::HasArg => todo!(),
-            Self::IsVararg => todo!("variadic"),
-            Self::NeedsArg => todo!(),
-        }
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::HasArg => "[[vararg::has_arg]]",
+                Self::IsVararg => "[[vararg::is_vararg]]",
+                Self::NeedsArg => "[[vararg::needs_arg]]",
+            }
+        )
     }
 }
 
@@ -582,13 +589,11 @@ impl IlChunk {
 
 impl Debug for IlChunk {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut buf = String::with_capacity(256);
-
-        for item in &self.0 {
-            buf.push_str(format!("{item:?}\n").as_str())
-        }
-
-        write!(f, "{buf}")
+        write!(
+            f,
+            "{}",
+            self.0.iter().map(|item| format!("{item:?}\n")).join("\n")
+        )
     }
 }
 
